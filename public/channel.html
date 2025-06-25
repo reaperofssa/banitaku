@@ -120,6 +120,7 @@
             align-items: center;
             justify-content: center;
             z-index: 10;
+            transition: opacity 0.3s ease;
         }
 
         .loading-spinner {
@@ -163,6 +164,12 @@
             box-shadow: 0 4px 12px rgba(255, 20, 147, 0.4);
         }
 
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .now-next-container {
             background: linear-gradient(135deg, rgba(255, 20, 147, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
             border-radius: 12px;
@@ -191,6 +198,7 @@
             border-radius: 8px;
             padding: 12px;
             border-left: 3px solid #ff1493;
+            transition: all 0.3s ease;
         }
 
         .up-next-card {
@@ -344,6 +352,48 @@
             font-size: 12px;
         }
 
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: 600;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .connection-status.connected {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+
+        .connection-status.disconnected {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+            border: 1px solid #ff0000;
+        }
+
+        .seamless-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(255, 20, 147, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .seamless-indicator.show {
+            opacity: 1;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -370,7 +420,6 @@
             }
         }
 
-        /* Compact mobile view */
         @media (max-width: 480px) {
             .logo {
                 font-size: 1.5rem;
@@ -388,6 +437,8 @@
     </style>
 </head>
 <body>
+    <div class="connection-status" id="connectionStatus">Connecting...</div>
+    
     <div class="container">
         <div class="top-nav">
             <a href="/" class="back-button">
@@ -409,17 +460,21 @@
                 <div class="loading-overlay" id="loadingOverlay">
                     <div class="loading-spinner"></div>
                 </div>
+                <div class="seamless-indicator" id="seamlessIndicator">
+                    Seamless Transition
+                </div>
             </div>
         </div>
 
         <div class="controls">
-            <button class="control-btn" onclick="toggleMute()">🔊 Mute</button>
+            <button class="control-btn" onclick="toggleMute()">🔊 <span id="muteText">Mute</span></button>
             <button class="control-btn" onclick="toggleFullscreen()">⛶ Full</button>
-            <button class="control-btn" onclick="refreshStream()">🔄 Refresh</button>
+            <button class="control-btn" onclick="refreshStream()" id="refreshBtn">🔄 Refresh</button>
+            <button class="control-btn" onclick="toggleAutoRefresh()" id="autoRefreshBtn">⚡ Auto</button>
         </div>
 
         <div class="now-next-container">
-            <div class="now-next-title"> Now & Up Next</div>
+            <div class="now-next-title">📺 Now & Up Next</div>
             <div class="now-next-grid">
                 <div class="now-playing-card">
                     <div class="card-label">
@@ -438,7 +493,7 @@
 
         <div class="schedule-container">
             <div class="schedule-header">
-                <div class="schedule-title">Program Guide</div>
+                <div class="schedule-title">📋 Program Guide</div>
                 <div class="schedule-nav">
                     <button class="nav-btn active" onclick="showToday()">Today</button>
                     <button class="nav-btn" onclick="showTomorrow()">Tomorrow</button>
@@ -460,15 +515,20 @@
         let channelId;
         let scheduleInterval;
         let currentSchedule = [];
+        let autoRefresh = false;
+        let autoRefreshInterval;
+        let connectionCheckInterval;
+        let lastPlaybackTime = 0;
+        let seamlessTransitionTimeout;
 
-        // Channel name mapping
+        // Enhanced channel name mapping
         const channelNames = {
-            'channel1': 'OtakuTV',
-            'channel2': 'AnimeToons',
-            'channel3': 'AniFlix',
-            'channel4': 'AniOngoing',
-            'channel5': 'EcchiTV',
-            'channel6': 'AnimePop'
+            'channel1': 'Anitaku TV 1',
+            'channel2': 'Anitaku TV 2', 
+            'channel3': 'Anitaku TV 3',
+            'channel4': 'Anitaku TV 4',
+            'channel5': 'Anitaku TV 5',
+            'channel6': 'Anitaku TV 6'
         };
 
         // Get channel ID from URL
@@ -478,56 +538,114 @@
             return match ? match[1] : 'channel1';
         }
 
-        // Initialize player
+        // Enhanced connection status monitoring
+        function updateConnectionStatus(status) {
+            const statusEl = document.getElementById('connectionStatus');
+            statusEl.className = `connection-status ${status}`;
+            statusEl.textContent = status === 'connected' ? '🟢 Live' : '🔴 Reconnecting...';
+        }
+
+        // Seamless transition indicator
+        function showSeamlessIndicator() {
+            const indicator = document.getElementById('seamlessIndicator');
+            indicator.classList.add('show');
+            clearTimeout(seamlessTransitionTimeout);
+            seamlessTransitionTimeout = setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 3000);
+        }
+
+        // Enhanced player initialization with seamless streaming support
         function initPlayer() {
             channelId = getChannelId();
             const video = document.getElementById('videoPlayer');
             const loadingOverlay = document.getElementById('loadingOverlay');
             
-            // Update channel name with proper mapping
+            // Update channel name
             const channelName = channelNames[channelId] || `Channel ${channelId.replace('channel', '')}`;
             document.getElementById('channelName').textContent = channelName;
             
             const streamUrl = `/hls/${channelId}/master.m3u8`;
             
-            // Prevent auto fullscreen on iOS
+            // Enhanced video attributes for seamless playback
             video.setAttribute('playsinline', '');
             video.setAttribute('webkit-playsinline', '');
+            video.setAttribute('preload', 'auto');
             
             if (Hls.isSupported()) {
                 hls = new Hls({
                     debug: false,
                     enableWorker: true,
                     lowLatencyMode: true,
-                    backBufferLength: 90
+                    backBufferLength: 90,
+                    maxBufferLength: 30,
+                    maxMaxBufferLength: 60,
+                    liveSyncDurationCount: 3,
+                    liveMaxLatencyDurationCount: 10,
+                    liveDurationInfinity: true,
+                    highBufferWatchdogPeriod: 2,
+                    nudgeOffset: 0.1,
+                    nudgeMaxRetry: 3,
+                    maxFragLookUpTolerance: 0.25,
+                    fragLoadingTimeOut: 20000,
+                    manifestLoadingTimeOut: 10000,
+                    levelLoadingTimeOut: 10000
                 });
                 
                 hls.loadSource(streamUrl);
                 hls.attachMedia(video);
                 
                 hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    console.log('Manifest loaded, starting playback');
+                    console.log('✅ Manifest loaded, starting seamless playback');
                     loadingOverlay.style.display = 'none';
+                    updateConnectionStatus('connected');
+                    
+                    // Auto-play for seamless experience
+                    video.play().catch(e => {
+                        console.log('Auto-play prevented, user interaction required');
+                    });
+                });
+                
+                hls.on(Hls.Events.FRAG_CHANGED, function() {
+                    // Detect seamless transitions
+                    const currentTime = video.currentTime;
+                    if (Math.abs(currentTime - lastPlaybackTime) > 1) {
+                        showSeamlessIndicator();
+                    }
+                    lastPlaybackTime = currentTime;
                 });
                 
                 hls.on(Hls.Events.ERROR, function(event, data) {
+                    console.log('HLS Error:', data);
+                    updateConnectionStatus('disconnected');
+                    
                     if (data.fatal) {
                         switch(data.type) {
                             case Hls.ErrorTypes.NETWORK_ERROR:
-                                console.log('Network error, trying to recover...');
-                                hls.startLoad();
+                                console.log('🔄 Network error, attempting recovery...');
+                                setTimeout(() => {
+                                    hls.startLoad();
+                                }, 1000);
                                 break;
                             case Hls.ErrorTypes.MEDIA_ERROR:
-                                console.log('Media error, trying to recover...');
-                                hls.recoverMediaError();
+                                console.log('🔄 Media error, attempting recovery...');
+                                setTimeout(() => {
+                                    hls.recoverMediaError();
+                                }, 1000);
                                 break;
                             default:
-                                console.log('Fatal error, destroying HLS instance');
-                                hls.destroy();
-                                showError('Stream error occurred. Please refresh the page.');
+                                console.log('💥 Fatal error, reinitializing...');
+                                setTimeout(() => {
+                                    reinitializePlayer();
+                                }, 3000);
                                 break;
                         }
                     }
+                });
+                
+                // Enhanced buffering detection
+                hls.on(Hls.Events.BUFFER_APPENDED, function() {
+                    updateConnectionStatus('connected');
                 });
                 
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
@@ -535,18 +653,22 @@
                 video.src = streamUrl;
                 video.addEventListener('loadedmetadata', function() {
                     loadingOverlay.style.display = 'none';
+                    updateConnectionStatus('connected');
                 });
             } else {
-                showError('HLS is not supported in this browser.');
+                showError('HLS streaming is not supported in this browser.');
+                return;
             }
             
-            // Video event listeners
+            // Enhanced video event listeners for seamless experience
             video.addEventListener('loadstart', () => {
                 loadingOverlay.style.display = 'flex';
+                updateConnectionStatus('disconnected');
             });
             
             video.addEventListener('canplay', () => {
                 loadingOverlay.style.display = 'none';
+                updateConnectionStatus('connected');
             });
             
             video.addEventListener('waiting', () => {
@@ -555,13 +677,65 @@
             
             video.addEventListener('playing', () => {
                 loadingOverlay.style.display = 'none';
+                updateConnectionStatus('connected');
             });
+            
+            video.addEventListener('stalled', () => {
+                console.log('⚠️ Stream stalled, checking connection...');
+                updateConnectionStatus('disconnected');
+            });
+            
+            video.addEventListener('suspend', () => {
+                console.log('📡 Stream suspended');
+            });
+            
+            video.addEventListener('abort', () => {
+                console.log('🛑 Stream aborted');
+                updateConnectionStatus('disconnected');
+            });
+            
+            // Monitor playback health
+            startConnectionMonitoring();
         }
 
-        // Load schedule
+        // Connection monitoring for seamless experience
+        function startConnectionMonitoring() {
+            connectionCheckInterval = setInterval(() => {
+                const video = document.getElementById('videoPlayer');
+                if (video && !video.paused && !video.ended) {
+                    const currentTime = video.currentTime;
+                    if (currentTime === lastPlaybackTime) {
+                        console.log('⚠️ Playback stalled, attempting refresh...');
+                        updateConnectionStatus('disconnected');
+                        if (autoRefresh) {
+                            refreshStream();
+                        }
+                    } else {
+                        updateConnectionStatus('connected');
+                    }
+                    lastPlaybackTime = currentTime;
+                }
+            }, 5000);
+        }
+
+        // Reinitialize player for recovery
+        function reinitializePlayer() {
+            console.log('🔄 Reinitializing player for seamless recovery...');
+            if (hls) {
+                hls.destroy();
+            }
+            clearInterval(connectionCheckInterval);
+            setTimeout(() => {
+                initPlayer();
+            }, 1000);
+        }
+
+        // Enhanced schedule loading with real-time updates
         async function loadSchedule() {
             try {
                 const response = await fetch(`/api/schedule/${channelId}`);
+                if (!response.ok) throw new Error('Schedule fetch failed');
+                
                 const schedule = await response.json();
                 currentSchedule = schedule;
                 
@@ -587,8 +761,8 @@
                     const scheduleItem = document.createElement('div');
                     scheduleItem.className = 'schedule-item';
                     
-                    // Check if this is the current program
-                    const isCurrent = currentTime >= item.startTime && currentTime <= item.endTime;
+                    // Enhanced current program detection
+                    const isCurrent = isTimeInRange(currentTime, item.startTime, item.endTime);
                     if (isCurrent) {
                         scheduleItem.classList.add('current');
                         currentShow = item;
@@ -613,7 +787,26 @@
             }
         }
 
-        // Update Now & Up Next section
+        // Enhanced time range checking
+        function isTimeInRange(currentTime, startTime, endTime) {
+            const current = timeToMinutes(currentTime);
+            const start = timeToMinutes(startTime);
+            const end = timeToMinutes(endTime);
+            
+            if (end < start) {
+                // Crosses midnight
+                return current >= start || current <= end;
+            } else {
+                return current >= start && current <= end;
+            }
+        }
+
+        function timeToMinutes(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        // Enhanced Now & Up Next updates
         function updateNowNext(current, next) {
             const currentShowEl = document.getElementById('currentShow');
             const currentTimeEl = document.getElementById('currentTime');
@@ -623,6 +816,15 @@
             if (current) {
                 currentShowEl.textContent = current.title;
                 currentTimeEl.textContent = `${current.startTime} - ${current.endTime}`;
+                
+                // Show transition indicator near program end
+                const now = new Date();
+                const endTime = new Date(now.toDateString() + ' ' + current.endTime);
+                const timeUntilEnd = endTime.getTime() - now.getTime();
+                
+                if (timeUntilEnd <= 60000 && timeUntilEnd > 0) { // 1 minute before end
+                    showSeamlessIndicator();
+                }
             } else {
                 currentShowEl.textContent = 'No current program';
                 currentTimeEl.textContent = '--:-- - --:--';
@@ -647,8 +849,7 @@
         function showTomorrow() {
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            // Load tomorrow's schedule (placeholder)
-            console.log('Loading tomorrow\'s schedule...');
+            console.log('Tomorrow\'s schedule feature coming soon...');
         }
 
         function scrollToNow() {
@@ -658,10 +859,12 @@
             }
         }
 
-        // Control functions
+        // Enhanced control functions
         function toggleMute() {
             const video = document.getElementById('videoPlayer');
+            const muteText = document.getElementById('muteText');
             video.muted = !video.muted;
+            muteText.textContent = video.muted ? 'Unmute' : 'Mute';
         }
 
         function toggleFullscreen() {
@@ -676,22 +879,51 @@
         }
 
         function refreshStream() {
-  const loadingOverlay = document.getElementById('loadingOverlay');
-  loadingOverlay.style.display = 'flex';
-  
-  setTimeout(() => {
-    window.location.reload();
-  }, 300); // small delay to show overlay
-}
+            const refreshBtn = document.getElementById('refreshBtn');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = '🔄 Refreshing...';
+            loadingOverlay.style.display = 'flex';
+            
+            setTimeout(() => {
+                reinitializePlayer();
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '🔄 Refresh';
+            }, 2000);
+        }
+
+        function toggleAutoRefresh() {
+            const autoRefreshBtn = document.getElementById('autoRefreshBtn');
+            autoRefresh = !autoRefresh;
+            
+            if (autoRefresh) {
+                autoRefreshBtn.innerHTML = '⚡ Auto ON';
+                autoRefreshBtn.style.background = 'linear-gradient(135deg, #00ff00 0%, #00cc00 100%)';
+                
+                // Auto-refresh every 5 minutes if connection issues
+                autoRefreshInterval = setInterval(() => {
+                    const video = document.getElementById('videoPlayer');
+                    if (video.paused || video.ended || video.currentTime === lastPlaybackTime) {
+                        console.log('🔄 Auto-refresh triggered');
+                        refreshStream();
+                    }
+                }, 300000); // 5 minutes
+            } else {
+                autoRefreshBtn.innerHTML = '⚡ Auto';
+                autoRefreshBtn.style.background = 'linear-gradient(135deg, #ff1493 0%, #ff69b4 100%)';
+                clearInterval(autoRefreshInterval);
+            }
+        }
 
         function showError(message) {
             const loadingOverlay = document.getElementById('loadingOverlay');
             loadingOverlay.innerHTML = `
                 <div class="error-message">
-                    <h3>⚠️ Error</h3>
+                    <h3>⚠️ Stream Error</h3>
                     <p>${message}</p>
                     <button class="control-btn" onclick="refreshStream()" style="margin-top: 10px;">
-                        Try Again
+                        🔄 Try Again
                     </button>
                 </div>
             `;
@@ -699,20 +931,59 @@
 
         // Initialize everything when page loads
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initializing AnitakuX seamless streaming...');
+            
             initPlayer();
             loadSchedule();
             
-            // Refresh schedule every 30 seconds
-            scheduleInterval = setInterval(loadSchedule, 30000);
+            // Enhanced schedule refresh for real-time updates
+            scheduleInterval = setInterval(() => {
+                loadSchedule();
+            }, 15000); // Every 15 seconds for better real-time experience
+            
+            // Keyboard shortcuts for better UX
+            document.addEventListener('keydown', function(e) {
+                const video = document.getElementById('videoPlayer');
+                switch(e.key) {
+                    case ' ':
+                        e.preventDefault();
+                        video.paused ? video.play() : video.pause();
+                        break;
+                    case 'm':
+                        toggleMute();
+                        break;
+                    case 'f':
+                        toggleFullscreen();
+                        break;
+                    case 'r':
+                        refreshStream();
+                        break;
+                }
+            });
         });
 
-        // Cleanup on page unload
+        // Enhanced cleanup on page unload
         window.addEventListener('beforeunload', function() {
+            console.log('🧹 Cleaning up resources...');
             if (hls) {
                 hls.destroy();
             }
-            if (scheduleInterval) {
-                clearInterval(scheduleInterval);
+            clearInterval(scheduleInterval);
+            clearInterval(autoRefreshInterval);
+            clearInterval(connectionCheckInterval);
+            clearTimeout(seamlessTransitionTimeout);
+        });
+
+        // Handle visibility changes for better resource management
+        document.addEventListener('visibilitychange', function() {
+            const video = document.getElementById('videoPlayer');
+            if (document.hidden) {
+                console.log('📱 Page hidden, maintaining stream...');
+            } else {
+                console.log('👁️ Page visible, ensuring optimal playback...');
+                if (video && video.paused) {
+                    video.play().catch(e => console.log('Play prevented:', e));
+                }
             }
         });
     </script>

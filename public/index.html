@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AnitakuX TV - Channels</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #000000;
+      color: #ffffff;
+      min-height: 100vh;
+      font-size: 14px;
+      background-image: 
+        radial-gradient(circle at 20% 80%, rgba(255, 20, 147, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 20, 147, 0.05) 0%, transparent 50%);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(255, 20, 147, 0.1) 0%, rgba(0, 0, 0, 0.8) 100%);
+      border-radius: 15px;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 20, 147, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 20, 147, 0.1), transparent);
+      animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .logo {
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: linear-gradient(45deg, #ff1493, #ff69b4, #ff1493);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #ff69b4;
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+
+    .network-status {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 25px;
+      padding: 12px 20px;
+      background: rgba(255, 20, 147, 0.05);
+      border-radius: 25px;
+      border: 1px solid rgba(255, 20, 147, 0.2);
+    }
+
+    .network-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .signal-bars {
+      display: flex;
+      gap: 2px;
+      align-items: end;
+    }
+
+    .bar {
+      width: 3px;
+      background: #ff1493;
+      border-radius: 1px;
+      transition: all 0.3s ease;
+    }
+
+    .bar:nth-child(1) { height: 6px; }
+    .bar:nth-child(2) { height: 9px; }
+    .bar:nth-child(3) { height: 12px; }
+    .bar:nth-child(4) { height: 15px; }
+
+    .bar.weak { background: #ff6b6b; }
+    .bar.good { background: #ff69b4; }
+    .bar.excellent { background: #ff1493; }
+
+    .ping-display {
+      color: #ff69b4;
+      font-weight: 600;
+    }
+
+    .channels-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .channel-card {
+      background: linear-gradient(135deg, rgba(255, 20, 147, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+      border-radius: 15px;
+      padding: 20px;
+      border: 1px solid rgba(255, 20, 147, 0.2);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .channel-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(255, 20, 147, 0.3);
+      border-color: rgba(255, 20, 147, 0.4);
+    }
+
+    .channel-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #ff1493, #ff69b4, #ff1493);
+    }
+
+    .channel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .channel-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .channel-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      color: #ff69b4;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ff1493;
+      animation: pulse 2s infinite;
+    }
+
+    .status-dot.offline {
+      background: #666;
+      animation: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.1); }
+    }
+
+    .now-next-section {
+      margin-bottom: 15px;
+    }
+
+    .now-playing, .up-next {
+      margin-bottom: 8px;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 8px;
+      border-left: 3px solid #ff1493;
+    }
+
+    .up-next {
+      border-left-color: #ff69b4;
+    }
+
+    .program-label {
+      font-size: 9px;
+      color: #ff69b4;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+      letter-spacing: 0.5px;
+    }
+
+    .program-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 2px;
+    }
+
+    .program-time {
+      font-size: 10px;
+      color: #ff1493;
+      font-weight: 500;
+    }
+
+    .watch-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 20, 147, 0.3);
+    }
+
+    .watch-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 20, 147, 0.5);
+      background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+    }
+
+    .loading-skeleton {
+      background: linear-gradient(90deg, rgba(255, 20, 147, 0.1) 25%, rgba(255, 20, 147, 0.2) 50%, rgba(255, 20, 147, 0.1) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 4px;
+      height: 12px;
+      margin: 2px 0;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .error-message {
+      text-align: center;
+      color: #ff6b6b;
+      padding: 15px;
+      background: rgba(255, 107, 107, 0.1);
+      border-radius: 8px;
+      margin: 10px 0;
+      font-size: 12px;
+      border: 1px solid rgba(255, 107, 107, 0.3);
+    }
+
+    .refresh-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: rgba(255, 20, 147, 0.1);
+      border: 1px solid #ff1493;
+      color: #ff1493;
+      border-radius: 15px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .refresh-button:hover {
+      background: rgba(255, 20, 147, 0.2);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+
+      .channels-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .logo {
+        font-size: 2rem;
+      }
+
+      .network-status {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .channel-card {
+        padding: 15px;
+      }
+
+      .channel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">AnitakuX TV</div>
+      <div class="subtitle">Premium Anime Streaming Channels</div>
+    </div>
+
+    <div class="network-status">
+      <div class="network-indicator">
+        <div class="signal-bars" id="signalBars">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+        <span id="networkStatus">Checking...</span>
+      </div>
+      <div class="ping-display">
+        Ping: <span id="pingValue">--</span>ms
+      </div>
+    </div>
+
+    <div class="channels-grid" id="channelsGrid">
+      <!-- Channels will be populated by JavaScript -->
+    </div>
+  </div>
+
+  <script>
+    const channels = [
+      { id: 'channel1', name: 'OtakuTV', path: '/watch/channel1' },
+      { id: 'channel2', name: 'AnimeToons', path: '/watch/channel2' },
+      { id: 'channel3', name: 'AniFlix', path: '/watch/channel3' },
+      { id: 'channel4', name: 'AniOngoing', path: '/watch/channel4' },
+      { id: 'channel5', name: 'EcchiTV', path: '/watch/channel5' },
+      { id: 'channel6', name: 'AnimePop', path: '/watch/channel6' }
+    ];
+
+    let channelSchedules = {};
+    let networkCheckInterval;
+    let scheduleUpdateInterval;
+
+    // Network monitoring
+    async function checkNetworkSpeed() {
+      const startTime = performance.now();
+      try {
+        // Ping a small endpoint
+        await fetch('/ping', { 
+          method: 'HEAD',
+          cache: 'no-cache'
+        });
+        const endTime = performance.now();
+        const ping = Math.round(endTime - startTime);
+        
+        updateNetworkStatus(ping);
+        return ping;
+      } catch (error) {
+        updateNetworkStatus(null);
+        return null;
+      }
+    }
+
+    function updateNetworkStatus(ping) {
+      const pingElement = document.getElementById('pingValue');
+      const statusElement = document.getElementById('networkStatus');
+      const signalBars = document.querySelectorAll('.bar');
+      
+      if (ping === null) {
+        pingElement.textContent = 'Error';
+        statusElement.textContent = 'Offline';
+        signalBars.forEach(bar => {
+          bar.className = 'bar weak';
+        });
+        return;
+      }
+      
+      pingElement.textContent = ping;
+      
+      // Update signal strength based on ping
+      signalBars.forEach(bar => bar.className = 'bar');
+      
+      if (ping < 50) {
+        statusElement.textContent = 'Excellent';
+        signalBars.forEach(bar => bar.classList.add('excellent'));
+      } else if (ping < 100) {
+        statusElement.textContent = 'Good';
+        signalBars.forEach((bar, index) => {
+          if (index < 3) bar.classList.add('good');
+        });
+      } else if (ping < 200) {
+        statusElement.textContent = 'Fair';
+        signalBars.forEach((bar, index) => {
+          if (index < 2) bar.classList.add('good');
+          else bar.classList.add('weak');
+        });
+      } else {
+        statusElement.textContent = 'Poor';
+        signalBars.forEach(bar => bar.classList.add('weak'));
+      }
+    }
+
+    // Load schedule for a specific channel
+    async function loadChannelSchedule(channelId) {
+      try {
+        const response = await fetch(`/api/schedule/${channelId}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const schedule = await response.json();
+        
+        const now = new Date();
+        const currentTime = now.toLocaleTimeString('en-US', { 
+          hour12: false,
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        
+        let currentShow = null;
+        let nextShow = null;
+        
+        // Find current and next shows
+        for (let i = 0; i < schedule.length; i++) {
+          const item = schedule[i];
+          const isCurrent = currentTime >= item.startTime && currentTime <= item.endTime;
+          
+          if (isCurrent) {
+            currentShow = item;
+            nextShow = schedule[i + 1] || null;
+            break;
+          }
+        }
+        
+        // If no current show found, find the next upcoming show
+        if (!currentShow && schedule.length > 0) {
+          for (let i = 0; i < schedule.length; i++) {
+            if (currentTime < schedule[i].startTime) {
+              nextShow = schedule[i];
+              break;
+            }
+          }
+        }
+        
+        channelSchedules[channelId] = {
+          current: currentShow,
+          next: nextShow,
+          isOnline: true,
+          lastUpdated: new Date()
+        };
+        
+      } catch (error) {
+        console.error(`Failed to load schedule for ${channelId}:`, error);
+        channelSchedules[channelId] = {
+          current: null,
+          next: null,
+          isOnline: false,
+          error: error.message,
+          lastUpdated: new Date()
+        };
+      }
+    }
+
+    // Load all channel schedules
+    async function loadAllSchedules() {
+      const promises = channels.map(channel => loadChannelSchedule(channel.id));
+      await Promise.all(promises);
+      renderChannels();
+    }
+
+    function createChannelCard(channel) {
+      const schedule = channelSchedules[channel.id];
+      
+      if (!schedule) {
+        return createLoadingCard(channel);
+      }
+      
+      if (!schedule.isOnline) {
+        return createErrorCard(channel, schedule.error);
+      }
+      
+      const currentProgram = schedule.current || { title: 'No current program', time: '--:-- - --:--' };
+      const nextProgram = schedule.next || { title: 'No upcoming program', time: '--:-- - --:--' };
+      
+      return `
+        <div class="channel-card">
+          <div class="channel-header">
+            <div class="channel-name">${channel.name}</div>
+            <div class="channel-status">
+              <div class="status-dot ${schedule.isOnline ? '' : 'offline'}"></div>
+              ${schedule.isOnline ? 'Live' : 'Offline'}
+            </div>
+          </div>
+          
+          <div class="now-next-section">
+            <div class="now-playing">
+              <div class="program-label">🔴 Now Playing</div>
+              <div class="program-title">${currentProgram.title}</div>
+              <div class="program-time">${currentProgram.startTime || currentProgram.time} - ${currentProgram.endTime || ''}</div>
+            </div>
+            
+            <div class="up-next">
+              <div class="program-label">⏭️ Up Next</div>
+              <div class="program-title">${nextProgram.title}</div>
+              <div class="program-time">${nextProgram.startTime || nextProgram.time} - ${nextProgram.endTime || ''}</div>
+            </div>
+          </div>
+          
+          <a href="${channel.path}" class="watch-button">
+            ▶️ Watch Now
+          </a>
+        </div>
+      `;
+    }
+
+    function createLoadingCard(channel) {
+      return `
+        <div class="channel-card">
+          <div class="channel-header">
+            <div class="channel-name">${channel.name}</div>
+            <div class="channel-status">
+              <div class="status-dot"></div>
+              Loading...
+            </div>
+          </div>
+          
+          <div class="now-next-section">
+            <div class="now-playing">
+              <div class="program-label">🔴 Now Playing</div>
+              <div class="loading-skeleton" style="width: 80%; margin-bottom: 5px;"></div>
+              <div class="loading-skeleton" style="width: 60%;"></div>
+            </div>
+            
+            <div class="up-next">
+              <div class="program-label">⏭️ Up Next</div>
+              <div class="loading-skeleton" style="width: 75%; margin-bottom: 5px;"></div>
+              <div class="loading-skeleton" style="width: 55%;"></div>
+            </div>
+          </div>
+          
+          <div class="loading-skeleton" style="width: 40%; height: 32px; border-radius: 20px;"></div>
+        </div>
+      `;
+    }
+
+    function createErrorCard(channel, error) {
+      return `
+        <div class="channel-card">
+          <div class="channel-header">
+            <div class="channel-name">${channel.name}</div>
+            <div class="channel-status">
+              <div class="status-dot offline"></div>
+              Offline
+            </div>
+          </div>
+          
+          <div class="error-message">
+            <p>⚠️ Unable to load schedule</p>
+            <p style="font-size: 10px; margin-top: 5px; opacity: 0.7;">${error}</p>
+            <button class="refresh-button" onclick="refreshChannel('${channel.id}')">
+              🔄 Retry
+            </button>
+          </div>
+          
+          <a href="${channel.path}" class="watch-button">
+            ▶️ Try Watch
+          </a>
+        </div>
+      `;
+    }
+
+    function renderChannels() {
+      const grid = document.getElementById('channelsGrid');
+      grid.innerHTML = channels.map(createChannelCard).join('');
+    }
+
+    async function refreshChannel(channelId) {
+      // Show loading state for specific channel
+      const channelIndex = channels.findIndex(c => c.id === channelId);
+      if (channelIndex !== -1) {
+        const grid = document.getElementById('channelsGrid');
+        const cards = grid.children;
+        if (cards[channelIndex]) {
+          cards[channelIndex].innerHTML = createLoadingCard(channels[channelIndex]).replace('<div class="channel-card">', '').replace('</div>', '');
+        }
+      }
+      
+      await loadChannelSchedule(channelId);
+      renderChannels();
+    }
+
+    // Initialize everything
+    document.addEventListener('DOMContentLoaded', function() {
+      // Show loading cards initially
+      renderChannels();
+      
+      // Load real data
+      loadAllSchedules();
+      
+      // Start network monitoring
+      checkNetworkSpeed();
+      networkCheckInterval = setInterval(checkNetworkSpeed, 5000);
+      
+      // Update schedules every 30 seconds
+      scheduleUpdateInterval = setInterval(loadAllSchedules, 30000);
+    });
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', function() {
+      if (networkCheckInterval) {
+        clearInterval(networkCheckInterval);
+      }
+      if (scheduleUpdateInterval) {
+        clearInterval(scheduleUpdateInterval);
+      }
+    });
+  </script>
+</body>
+</html>

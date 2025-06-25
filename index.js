@@ -1,6 +1,7 @@
 const { spawn } = require('child_process');
 const express = require('express');
 const fs = require('fs');
+const cors = require('cors');
 const path = require('path');
 const axios = require('axios');
 
@@ -11,7 +12,7 @@ const publicDir = path.join(__dirname, 'public');
 const transitionVideo = 'https://files.catbox.moe/hvl1cv.mp4';
 const watermarkText = 'AnitakuX';
 const channelsFile = path.join(__dirname, 'channels.json');
-
+app.use(cors());
 // Load channels from JSON file
 let channels = {};
 try {

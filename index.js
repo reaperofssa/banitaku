@@ -4,15 +4,16 @@ const fs = require('fs');
 const cors = require('cors'); 
 const path = require('path'); 
 const axios = require('axios'); 
+const ffmpeg = require('fluent-ffmpeg');
 
 const PORT = 7860; 
 const app = express(); 
 const baseOutputDir = path.join(__dirname, 'hls_output'); 
 const publicDir = path.join(__dirname, 'public'); 
-const transitionVideo = 'https://files.catbox.moe/hvl1cv.mp4'; 
 const watermarkText = 'AnitakuX'; 
 const channelsFile = path.join(__dirname, 'channels.json'); 
 app.use(cors()); 
+
 // Load channels from JSON file 
 let channels = {}; 
 try { 
@@ -82,26 +83,45 @@ function formatWATTime(date) {
   }); 
 } 
 
+// Get video duration using ffmpeg
+async function getVideoDuration(url) {
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(url, (err, metadata) => {
+      if (err) {
+        console.error(`Error probing video duration for ${url}:`, err);
+        return resolve(22 * 60 * 1000); // Fallback to 22 minutes
+      }
+      const durationSeconds = metadata.format.duration || 22 * 60;
+      resolve(durationSeconds * 1000); // Convert to milliseconds
+    });
+  });
+}
+
 // Generate schedule for a channel 
-function generateSchedule(channelConfig) { 
+async function generateSchedule(channelConfig) { 
   const schedule = []; 
   let currentTime = new Date(); 
-  channelConfig.playlist.forEach(anime => { 
+
+  for (const anime of channelConfig.playlist) { 
     for (let ep = anime.start; ep <= anime.end; ep++) { 
+      const url = await getEpisodeMp4(anime.title, ep);
+      if (!url) {
+        console.error(`Failed to get URL for ${anime.title} Episode ${ep}`);
+        continue;
+      }
+      const duration = await getVideoDuration(url); 
       const startTime = new Date(currentTime); 
-      // 22 minutes for episode + 3 minutes for ads = 25 minutes total 
-      const duration = (22 + 3) * 60 * 1000; // 25 minutes per episode slot 
       const endTime = new Date(currentTime.getTime() + duration); 
-       
+      
       schedule.push({ 
         title: `${anime.title} Episode ${ep}`, 
         startTime: formatWATTime(startTime), 
         endTime: formatWATTime(endTime) 
       }); 
-       
-      currentTime = new Date(endTime.getTime() + 1000); // 1 second gap for transition 
+      
+      currentTime = new Date(endTime.getTime() + 1000); // 1 second gap
     } 
-  }); 
+  } 
   return schedule; 
 } 
 
@@ -119,10 +139,10 @@ async function getEpisodeMp4(anime, ep) {
     .catch(() => null); 
 } 
 
-function startFFmpeg(channelId, inputUrl, outputDir, onExit) { 
+function startFFmpeg(channelId, inputUrl, outputDir, episodeNumber, onExit) { 
   const args = [ 
     '-re', '-i', inputUrl, 
-    '-vf', `drawtext=text='${watermarkText}':fontcolor=white:fontsize=24:x=w-tw-20:y=20`, 
+    '-vf', `drawtext=text='${watermarkText}':fontcolor=white:fontsize=24:x=w-tw-20:y=20,drawtext=text='Ep ${episodeNumber}':fontcolor=white:fontsize=20:x=w-tw-20:y=h-th-20`, 
     '-c:v', 'libx264', '-preset', 'veryfast', '-tune', 'zerolatency', 
     '-c:a', 'aac', '-b:a', '128k', 
     '-g', '50', '-sc_threshold', '0', 
@@ -142,42 +162,37 @@ function startFFmpeg(channelId, inputUrl, outputDir, onExit) {
   return proc; 
 } 
 
-function setupChannel(channelId, channelConfig) {
+async function setupChannel(channelId, channelConfig) {
   const state = {
     index: 0,
     ep: channelConfig.playlist[0].start,
-    isTransition: false,
     process: null,
     anime: channelConfig.playlist[0].title,
     preloadNextUrl: null,
-    preloadNextIsAd: false
+    nextEpisode: null
   };
 
   const channelOutput = path.join(baseOutputDir, channelId);
   if (fs.existsSync(channelOutput)) fs.rmSync(channelOutput, { recursive: true, force: true });
   fs.mkdirSync(channelOutput, { recursive: true });
 
-  channelConfig.schedule = generateSchedule(channelConfig);
+  channelConfig.schedule = await generateSchedule(channelConfig);
 
   async function preloadNext() {
     const entry = channelConfig.playlist[state.index];
-    let nextUrl = null;
-
-    if (!state.isTransition) {
-      // Next is episode
-      nextUrl = await getEpisodeMp4(entry.title, state.ep);
-      state.preloadNextIsAd = false;
-    } else {
-      // Next is ad
-      nextUrl = transitionVideo;
-      state.preloadNextIsAd = true;
-    }
-
+    const nextUrl = await getEpisodeMp4(entry.title, state.ep);
     state.preloadNextUrl = nextUrl;
+    state.nextEpisode = state.ep;
+    if (nextUrl) {
+      // Start preloading by probing the video
+      ffmpeg.ffprobe(nextUrl, (err) => {
+        if (err) console.error(`Error preloading ${entry.title} Episode ${state.ep}:`, err);
+      });
+    }
   }
 
-  async function play(url, onEnd) {
-    state.process = startFFmpeg(channelId, url, channelOutput, async () => {
+  async function play(url, episodeNumber, onEnd) {
+    state.process = startFFmpeg(channelId, url, channelOutput, episodeNumber, async () => {
       onEnd();
     });
   }
@@ -185,31 +200,31 @@ function setupChannel(channelId, channelConfig) {
   async function loop() {
     const entry = channelConfig.playlist[state.index];
 
-    // Step 1: Preload next stream
+    // Step 1: Preload next episode
     await preloadNext();
 
-    // Step 2: Play current (either anime or ad)
+    // Step 2: Play current episode
     const currentUrl = state.preloadNextUrl;
     if (!currentUrl) {
-      console.log(`[${channelId}] ❌ Failed to preload next content.`);
+      console.log(`[${channelId}] ❌ Failed to preload next episode.`);
       setTimeout(loop, 3000); // Retry after a short delay
       return;
     }
 
     // Step 3: Play it and prepare the next in background
-    play(currentUrl, async () => {
-      if (state.isTransition) {
-        // Finished ad → Next is episode
-        state.ep++;
-        if (state.ep > entry.end) {
-          state.index++;
-          if (state.index >= channelConfig.playlist.length) state.index = 0;
-          state.ep = channelConfig.playlist[state.index].start;
-        }
-        state.isTransition = false;
-      } else {
-        // Finished episode → Next is ad
-        state.isTransition = true;
+    play(currentUrl, state.nextEpisode, async () => {
+      state.ep++;
+      if (state.ep > entry.end) {
+        state.index++;
+        if (state.index >= channelConfig.playlist.length) state.index = 0;
+        state.ep = channelConfig.playlist[state.index].start;
+      }
+
+      // Update schedule if there's a significant delay
+      const now = new Date();
+      const lastScheduled = channelConfig.schedule[channelConfig.schedule.length - 1];
+      if (lastScheduled && new Date(`1970-01-01T${lastScheduled.endTime}:00Z`) < now) {
+        channelConfig.schedule = await generateSchedule(channelConfig);
       }
 
       loop(); // Go to next
@@ -221,13 +236,13 @@ function setupChannel(channelId, channelConfig) {
 } 
 
 // Route to add new anime 
-app.post('/api/add-anime', (req, res) => { 
+app.post('/api/add-anime', async (req, res) => { 
   const { channelId, title, start, end } = req.body; 
   if (!channels[channelId]) { 
     return res.status(400).json({ error: 'Invalid channel ID' }); 
   } 
   channels[channelId].playlist.push({ title, start: parseInt(start), end: parseInt(end) }); 
-  channels[channelId].schedule = generateSchedule(channels[channelId]); 
+  channels[channelId].schedule = await generateSchedule(channels[channelId]); 
   fs.writeFileSync(channelsFile, JSON.stringify(channels, null, 2)); 
   res.json({ success: true }); 
 }); 

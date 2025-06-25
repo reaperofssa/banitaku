@@ -1,0 +1,45 @@
+{
+  "channel1": {
+    "name": "Anitaku TV 1",
+    "playlist": [
+      { "title": "Lazarus", "start": 1, "end": 12 },
+      { "title": "Erased", "start": 1, "end": 12 }
+    ],
+    "schedule": []
+  },
+  "channel2": {
+    "name": "Anitaku TV 2",
+    "playlist": [
+      { "title": "Eminence in Shadow", "start": 1, "end": 20 }
+    ],
+    "schedule": []
+  },
+  "channel3": {
+    "name": "Anitaku TV 3",
+    "playlist": [
+      { "title": "Attack on Titan", "start": 1, "end": 25 }
+    ],
+    "schedule": []
+  },
+  "channel4": {
+    "name": "Anitaku TV 4",
+    "playlist": [
+      { "title": "Demon Slayer", "start": 1, "end": 26 }
+    ],
+    "schedule": []
+  },
+  "channel5": {
+    "name": "Anitaku TV 5",
+    "playlist": [
+      { "title": "Chained Soldier", "start": 1, "end": 11 }
+    ],
+    "schedule": []
+  },
+  "channel6": {
+    "name": "Anitaku TV 6",
+    "playlist": [
+      { "title": "Solo leveling", "start": 1, "end": 13 }
+    ],
+    "schedule": []
+  }
+}

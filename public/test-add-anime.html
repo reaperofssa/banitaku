@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Anime - Anitaku TV</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-black text-white font-sans">
+  <div class="container mx-auto p-4">
+    <h1 class="text-3xl text-center mb-6">Add New Anime</h1>
+    <div class="max-w-md mx-auto bg-gray-800 p-6 rounded">
+      <div class="mb-4">
+        <label class="block mb-2">Channel</label>
+        <select id="channelId" class="w-full bg-gray-700 p-2 rounded text-white">
+          <option value="channel1">Anitaku TV 1</option>
+          <option value="channel2">Anitaku TV 2</option>
+          <option value="channel3">Anitaku TV 3</option>
+          <option value="channel4">Anitaku TV 4</option>
+          <option value="channel5">Anitaku TV 5</option>
+          <option value="channel6">Anitaku TV 6</option>
+        </select>
+      </div>
+      <div class="mb-4">
+        <label class="block mb-2">Anime Title</label>
+        <input id="title" type="text" class="w-full bg-gray-700 p-2 rounded text-white" placeholder="Enter anime title">
+      </div>
+      <div class="mb-4">
+        <label class="block mb-2">Start Episode</label>
+        <input id="start" type="number" class="w-full bg-gray-700 p-2 rounded text-white" placeholder="1" min="1">
+      </div>
+      <div class="mb-4">
+        <label class="block mb-2">End Episode</label>
+        <input id="end" type="number" class="w-full bg-gray-700 p-2 rounded text-white" placeholder="12" min="1">
+      </div>
+      <button onclick="addAnime()" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Add Anime</button>
+      <p id="message" class="mt-4 text-center"></p>
+    </div>
+    <div class="mt-6 text-center">
+      <a href="/" class="text-blue-400 hover:underline">Back to Channels</a>
+    </div>
+  </div>
+  <script>
+    async function addAnime() {
+      const channelId = document.getElementById('channelId').value;
+      const title = document.getElementById('title').value;
+      const start = document.getElementById('start').value;
+      const end = document.getElementById('end').value;
+      const message = document.getElementById('message');
+
+      if (!title || !start || !end) {
+        message.textContent = 'Please fill all fields';
+        message.className = 'text-red-500';
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/add-anime', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channelId, title, start, end })
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+          message.textContent = 'Anime added successfully!';
+          message.className = 'text-green-500';
+          setTimeout(() => window.location.href = '/', 2000);
+        } else {
+          message.textContent = data.error || 'Failed to add anime';
+          message.className = 'text-red-500';
+        }
+      } catch (err) {
+        message.textContent = 'Error adding anime';
+        message.className = 'text-red-500';
+      }
+    }
+  </script>
+</body>
+</html>

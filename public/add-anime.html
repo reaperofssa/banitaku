@@ -3,650 +3,363 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Anime - AnitakuX</title>
+    <title>Add and Manage Anime - AnitakuX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            background-color: #1a1a1a;
+            color: #ffffff;
         }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        select, input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-
-        select:focus, input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .episodes-container {
-            border: 2px dashed #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 15px;
-            background: #f9f9f9;
-        }
-
-        .episode-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            align-items: center;
-        }
-
-        .episode-row input {
-            margin-bottom: 0;
-        }
-
-        .episode-number {
-            width: 100px;
-            flex-shrink: 0;
-        }
-
-        .episode-link {
-            flex-grow: 1;
-        }
-
-        .remove-btn {
-            background: #ff4757;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        .remove-btn:hover {
-            background: #ff3742;
-        }
-
-        .add-episode-btn {
-            background: #2ecc71;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        .add-episode-btn:hover {
-            background: #27ae60;
-        }
-
-        .submit-btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 18px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 20px;
-            transition: transform 0.2s ease;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .message {
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            display: none;
-        }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-
-        .queue-info {
-            background: #e3f2fd;
-            border: 1px solid #bbdefb;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        .queue-info h3 {
-            color: #1976d2;
-            margin-bottom: 10px;
-        }
-
-        .current-queue {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .queue-item {
-            background: white;
-            padding: 8px 12px;
-            margin: 5px 0;
-            border-radius: 5px;
-            border-left: 4px solid #2196f3;
-        }
-
-        .episode-fetch-container {
-            border: 2px dashed #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            background: #f9f9f9;
-        }
-
-        .episode-fetch-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            align-items: center;
-        }
-
-        .fetch-btn {
-            background: #2196f3;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .fetch-btn:hover {
-            background: #1976d2;
-        }
-
-        .fetch-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .links-container {
-            margin-top: 10px;
-            padding: 10px;
-            background: #fff;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-
-        .links-container h4 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .link-item {
-            margin: 5px 0;
-        }
-
-        .link-item button {
-            margin-left: 10px;
-            background: #ff9800;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .link-item button:hover {
-            background: #f57c00;
-        }
-
-        .link-item button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .play-options {
-            margin-bottom: 20px;
-        }
-
-        .play-options label {
-            display: inline-block;
-            margin-right: 20px;
-            margin-bottom: 10px;
-        }
+        .error { color: #ff4444; }
+        .success { color: #44ff44; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <a href="/" class="back-link">← Back to Channels</a>
-        
-        <h1>Add New Anime</h1>
-        
-        <div id="message" class="message"></div>
-        
-        <div id="queueInfo" class="queue-info" style="display: none;">
-            <h3>Current Queue</h3>
-            <div id="currentQueue" class="current-queue"></div>
-        </div>
+<body class="min-h-screen flex flex-col items-center justify-start p-4">
+    <div class="w-full max-w-4xl">
+        <h1 class="text-3xl font-bold text-center mb-8">Add and Manage Anime</h1>
 
-        <div class="episode-fetch-container">
-            <h3>Fetch Episode Links</h3>
-            <div class="episode-fetch-row">
-                <input type="text" id="fetchAnimeTitle" placeholder="Anime Title (e.g., One Piece)" required>
-                <input type="number" id="fetchEpisodeNumber" placeholder="Episode #" min="1" required>
-                <select id="fetchType">
-                    <option value="sub">Sub</option>
-                    <option value="dub">Dub</option>
-                </select>
-                <select id="fetchResolution">
-                    <option value="360p">360p</option>
-                    <option value="720p">720p</option>
-                    <option value="1080p">1080p</option>
-                </select>
-                <button type="button" class="fetch-btn" onclick="fetchEpisodeLinks()">Fetch Links</button>
-            </div>
-            <div id="linksContainer" class="links-container" style="display: none;"></div>
-        </div>
-
-        <form id="addAnimeForm">
-            <div class="form-group">
-                <label for="channelSelect">Select Channel:</label>
-                <select id="channelSelect" required>
-                    <option value="">Choose a channel...</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="animeTitle">Anime Title:</label>
-                <input type="text" id="animeTitle" required placeholder="Enter anime title...">
-            </div>
-
-            <div class="play-options">
-                <label><input type="radio" name="playOption" value="immediately"> Play Immediately</label>
-                <label><input type="radio" name="playOption" value="afterCurrent" checked> Play After Current Anime</label>
-                <label><input type="radio" name="playOption" value="queue"> Add to End of Queue</label>
-            </div>
-
-            <div class="form-group">
-                <label>Episodes:</label>
-                <div class="episodes-container">
-                    <div id="episodesContainer">
-                        <!-- Episodes will be added here -->
-                    </div>
-                    <button type="button" class="add-episode-btn" onclick="addEpisodeRow()">
-                        + Add Episode
-                    </button>
+        <!-- Get Anime Link Section -->
+        <div class="mb-8 p-6 bg-gray-800 rounded-lg">
+            <h2 class="text-2xl font-semibold mb-4">Get Anime Episode Link</h2>
+            <form id="getAnimeLinkForm" class="space-y-4">
+                <div>
+                    <label for="animeTitleSearch" class="block text-sm font-medium">Anime Title</label>
+                    <input type="text" id="animeTitleSearch" class="mt-1 p-2 w-full bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., One Piece" required>
                 </div>
+                <div>
+                    <label for="episodeNumberSearch" class="block text-sm font-medium">Episode Number</label>
+                    <input type="number" id="episodeNumberSearch" class="mt-1 p-2 w-full bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 1100" min="1" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Get Episode Link</button>
+            </form>
+            <div id="linkResult" class="mt-4"></div>
+            <!-- Resolve Download Link Section -->
+            <div id="resolveLinkSection" class="mt-4 hidden">
+                <h3 class="text-lg font-semibold mb-2">Resolve Download Link</h3>
+                <form id="resolveLinkForm" class="space-y-4">
+                    <div>
+                        <label for="downloadLink" class="block text-sm font-medium">Download Link (from above)</label>
+                        <input type="text" id="downloadLink" class="mt-1 p-2 w-full bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Paste download link here">
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Resolve to MP4 Link</button>
+                </form>
+                <div id="resolveResult" class="mt-4"></div>
             </div>
+        </div>
 
-            <button type="submit" class="submit-btn" id="submitBtn">
-                Add Anime to Queue
-            </button>
-        </form>
+        <!-- Add Anime Section -->
+        <div class="mb-8 p-6 bg-gray-800 rounded-lg">
+            <h2 class="text-2xl font-semibold mb-4">Add New Anime</h2>
+            <form id="addAnimeForm" class="space-y-4">
+                <div>
+                    <label for="channelId" class="block text-sm font-medium">Channel</label>
+                    <select id="channelId" class="mt-1 p-2 w-full bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <option value="">Select a channel</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="animeTitle" class="block text-sm font-medium">Anime Title</label>
+                    <input type="text" id="animeTitle" class="mt-1 p-2 w-full bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., One Piece" required>
+                </div>
+                <div id="episodesContainer" class="space-y-4">
+                    <div class="episode-entry flex space-x-2">
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium">Episode Number</label>
+                            <input type="number" name="episode" class="mt-1 p-2 w-full bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 1" min="1" required>
+                        </div>
+                        <div class="flex-3">
+                            <label class="block text-sm font-medium">MP4 Link</label>
+                            <input type="text" name="mp4Link" class="mt-1 p-2 w-full bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., https://vault-12.kwik.cx/..." required>
+                        </div>
+                        <button type="button" class="remove-episode mt-7 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Remove</button>
+                    </div>
+                </div>
+                <button type="button" id="addEpisode" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Add Another Episode</button>
+                <div class="flex space-x-4">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="playImmediately" class="mr-2">
+                        <span>Play Immediately</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="playAfterCurrentAnime" class="mr-2">
+                        <span>Play After Current Anime</span>
+                    </label>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add Anime</button>
+            </form>
+            <div id="addAnimeResult" class="mt-4"></div>
+        </div>
+
+        <!-- Manage Queue Section -->
+        <div class="p-6 bg-gray-800 rounded-lg">
+            <h2 class="text-2xl font-semibold mb-4">Manage Queue</h2>
+            <div>
+                <label for="queueChannelId" class="block text-sm font-medium">Channel</label>
+                <select id="queueChannelId" class="mt-1 p-2 w-full bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <option value="">Select a channel</option>
+                </select>
+            </div>
+            <div id="queueContainer" class="mt-4 space-y-2"></div>
+            <div id="queueResult" class="mt-4"></div>
+            <button id="playAgain" class="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded hidden">Play Playlist Again</button>
+        </div>
     </div>
 
     <script>
-        let episodeCount = 0;
-
-        // Load channels on page load
-        document.addEventListener('DOMContentLoaded', loadChannels);
-
-        async function loadChannels() {
+        // Fetch channels and populate dropdowns
+        async function fetchChannels() {
             try {
                 const response = await fetch('/api/channels');
                 const channels = await response.json();
+                const channelSelect = document.getElementById('channelId');
+                const queueChannelSelect = document.getElementById('queueChannelId');
                 
-                const select = document.getElementById('channelSelect');
-                select.innerHTML = '<option value="">Choose a channel...</option>';
-                
-                for (const [id, channel] of Object.entries(channels)) {
+                for (const [id, config] of Object.entries(channels)) {
                     const option = document.createElement('option');
                     option.value = id;
-                    option.textContent = channel.name;
-                    select.appendChild(option);
+                    option.textContent = config.name;
+                    channelSelect.appendChild(option);
+                    queueChannelSelect.appendChild(option.cloneNode(true));
                 }
-                
-                // Add first episode row
-                addEpisodeRow();
-                
-                // Load queue when channel changes
-                select.addEventListener('change', loadChannelQueue);
-                
             } catch (error) {
-                showMessage('Failed to load channels', 'error');
+                console.error('Error fetching channels:', error);
             }
         }
 
-        async function loadChannelQueue() {
-            const channelId = document.getElementById('channelSelect').value;
-            const queueInfo = document.getElementById('queueInfo');
-            
-            if (!channelId) {
-                queueInfo.style.display = 'none';
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/api/queue/${channelId}`);
-                const data = await response.json();
-                
-                const queueContainer = document.getElementById('currentQueue');
-                queueContainer.innerHTML = '';
-                
-                if (data.queue && data.queue.length > 0) {
-                    data.queue.forEach(item => {
-                        const div = document.createElement('div');
-                        div.className = 'queue-item';
-                        div.innerHTML = `
-                            <strong>${item.position}. ${item.title}</strong> 
-                            (${item.episodeCount} episodes) 
-                            <span style="color: ${item.status === 'currently_playing' ? '#e74c3c' : '#7f8c8d'}">
-                                ${item.status === 'currently_playing' ? '▶ Playing' : '⏳ Queued'}
-                            </span>
-                        `;
-                        queueContainer.appendChild(div);
-                    });
-                    queueInfo.style.display = 'block';
-                } else {
-                    queueInfo.style.display = 'none';
-                }
-                
-            } catch (error) {
-                console.error('Failed to load queue:', error);
-            }
-        }
-
-        function addEpisodeRow(episodeNum = episodeCount + 1, mp4Link = '') {
-            episodeCount++;
+        // Add episode input field
+        document.getElementById('addEpisode').addEventListener('click', () => {
             const container = document.getElementById('episodesContainer');
-            
-            const episodeRow = document.createElement('div');
-            episodeRow.className = 'episode-row';
-            episodeRow.innerHTML = `
-                <input type="number" class="episode-number" placeholder="Ep #" min="1" value="${episodeNum}" required>
-                <input type="url" class="episode-link" placeholder="MP4 Link[](https://...)" value="${mp4Link}" required>
-                <button type="button" class="remove-btn" onclick="removeEpisodeRow(this)">Remove</button>
+            const newEntry = document.createElement('div');
+            newEntry.className = 'episode-entry flex space-x-2';
+            newEntry.innerHTML = `
+                <div class="flex-1">
+                    <label class="block text-sm font-medium">Episode Number</label>
+                    <input type="number" name="episode" class="mt-1 p-2 w-full bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 1" min="1" required>
+                </div>
+                <div class="flex-3">
+                    <label class="block text-sm font-medium">MP4 Link</label>
+                    <input type="text" name="mp4Link" class="mt-1 p-2 w-full bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., https://vault-12.kwik.cx/..." required>
+                </div>
+                <button type="button" class="remove-episode mt-7 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Remove</button>
             `;
-            
-            container.appendChild(episodeRow);
-        }
+            container.appendChild(newEntry);
+            bindRemoveEpisodeButtons();
+        });
 
-        function removeEpisodeRow(button) {
-            const rows = document.querySelectorAll('.episode-row');
-            if (rows.length > 1) {
-                button.parentElement.remove();
-                renumberEpisodes();
-            } else {
-                showMessage('At least one episode is required', 'error');
-            }
-        }
-
-        function renumberEpisodes() {
-            const rows = document.querySelectorAll('.episode-row');
-            rows.forEach((row, index) => {
-                const episodeInput = row.querySelector('.episode-number');
-                if (!episodeInput.value) {
-                    episodeInput.value = index + 1;
-                }
+        // Bind remove episode buttons
+        function bindRemoveEpisodeButtons() {
+            document.querySelectorAll('.remove-episode').forEach(button => {
+                button.addEventListener('click', () => {
+                    if (document.querySelectorAll('.episode-entry').length > 1) {
+                        button.parentElement.remove();
+                    }
+                });
             });
         }
 
-        async function fetchEpisodeLinks() {
-            const animeTitle = document.getElementById('fetchAnimeTitle').value.trim();
-            const episodeNumber = document.getElementById('fetchEpisodeNumber').value;
-            const type = document.getElementById('fetchType').value;
-            const resolution = document.getElementById('fetchResolution').value;
-            const fetchBtn = document.querySelector('.fetch-btn');
-            const linksContainer = document.getElementById('linksContainer');
-
-            if (!animeTitle || !episodeNumber) {
-                showMessage('Please enter anime title and episode number', 'error');
-                return;
-            }
-
-            fetchBtn.disabled = true;
-            fetchBtn.textContent = 'Fetching...';
+        // Get Anime Link Form
+        document.getElementById('getAnimeLinkForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('animeTitleSearch').value.trim();
+            const episode = document.getElementById('episodeNumberSearch').value;
+            const resultDiv = document.getElementById('linkResult');
+            const resolveSection = document.getElementById('resolve_LinkSection');
+            const downloadLinkInput = document.getElementById('downloadLink');
 
             try {
-                const response = await fetch(`https://txtorg-anihx.hf.space/api/episode?anime=${encodeURIComponent(animeTitle)}&ep=${episodeNumber}`);
+                const response = await fetch(`https://txtorg-anihx.hf.space/api/episode?anime=${encodeURIComponent(title)}&ep=${episode}`);
                 const data = await response.json();
-
-                linksContainer.innerHTML = '';
-
-                if (!data.links || (!data.links.sub && !data.links.dub)) {
-                    showMessage('No links found for this episode', 'error');
-                    linksContainer.style.display = 'none';
-                    return;
+                
+                if (data.links?.sub?.['360p_download']) {
+                    resultDiv.innerHTML = `
+                        <p class="success">Found episode link!</p>
+                        <p>Title: ${data.title}</p>
+                        <p>Episode: ${data.episode}</p>
+                        <p>Snapshot: <a href="${data.snapshot}" target="_blank" class="text-blue-400">View</a></p>
+                        <p>360p Download Link: <a href="${data.links.sub['360p_download']}" target="_blank" class="text-blue-400">${data.links.sub['360p_download']}</a></p>
+                    `;
+                    resolveSection.classList.remove('hidden');
+                    downloadLinkInput.value = data.links.sub['360p_download'];
+                } else {
+                    resultDiv.innerHTML = '<p class="error">Episode not found or no download link available.</p>';
+                    resolveSection.classList.add('hidden');
                 }
-
-                // Update main anime title input if empty
-                if (!document.getElementById('animeTitle').value) {
-                    document.getElementById('animeTitle').value = data.title;
-                }
-
-                // Display available links
-                const subLinks = data.links.sub || {};
-                const dubLinks = data.links.dub || {};
-                let html = `<h4>Available Links for ${data.title} Episode ${episodeNumber}</h4>`;
-
-                for (const res of ['360p', '720p', '1080p']) {
-                    if (subLinks[res]) {
-                        html += `<div class="link-item">Sub (${res}): <a href="${subLinks[res]}" target="_blank">${subLinks[res]}</a>`;
-                        if (res === resolution && type === 'sub') {
-                            html += ` <button onclick="convertToMp4('${subLinks[res + '_download']}', ${episodeNumber})">Convert to MP4</button>`;
-                        }
-                        html += `</div>`;
-                    }
-                    if (dubLinks[res]) {
-                        html += `<div class="link-item">Dub (${res}): <a href="${dubLinks[res]}" target="_blank">${dubLinks[res]}</a>`;
-                        if (res === resolution && type === 'dub') {
-                            html += ` <button onclick="convertToMp4('${dubLinks[res + '_download']}', ${episodeNumber})">Convert to MP4</button>`;
-                        }
-                        html += `</div>`;
-                    }
-                }
-
-                linksContainer.innerHTML = html;
-                linksContainer.style.display = 'block';
-
             } catch (error) {
-                showMessage('Failed to fetch episode links', 'error');
-                console.error('Error fetching links:', error);
-            } finally {
-                fetchBtn.disabled = false;
-                fetchBtn.textContent = 'Fetch Links';
+                resultDiv.innerHTML = `<p class="error">Error fetching episode link: ${error.message}</p>`;
+                resolveSection.classList.add('hidden');
             }
-        }
+        });
 
-        async function convertToMp4(downloadLink, episodeNumber) {
-            const button = event.target;
-            button.disabled = true;
-            button.textContent = 'Converting...';
+        // Resolve Download Link Form
+        document.getElementById('resolveLinkForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const downloadLink = document.getElementById('downloadLink').value.trim();
+            const resultDiv = document.getElementById('resolveResult');
 
             try {
                 const response = await fetch(`https://txtorg-anihx.hf.space/resolvex?url=${encodeURIComponent(downloadLink)}`);
                 const data = await response.json();
-
+                
                 if (data.mp4Link) {
-                    // Check if episode already exists in form
-                    const episodeInputs = document.querySelectorAll('.episode-number');
-                    const existingRow = Array.from(episodeInputs).find(input => parseInt(input.value) === episodeNumber);
-
-                    if (existingRow) {
-                        existingRow.parentElement.querySelector('.episode-link').value = data.mp4Link;
-                    } else {
-                        addEpisodeRow(episodeNumber, data.mp4Link);
-                    }
-                    showMessage(`MP4 link for Episode ${episodeNumber} added to form`, 'success');
+                    resultDiv.innerHTML = `
+                        <p class="success">Resolved MP4 link!</p>
+                        <p>MP4 Link: <a href="${data.mp4Link}" target="_blank" class="text-blue-400">${data.mp4Link}</a></p>
+                    `;
                 } else {
-                    showMessage('Failed to convert to MP4', 'error');
+                    resultDiv.innerHTML = '<p class="error">Failed to resolve MP4 link.</p>';
                 }
-
             } catch (error) {
-                showMessage('Error converting to MP4', 'error');
-                console.error('Error converting:', error);
-            } finally {
-                button.disabled = false;
-                button.textContent = 'Convert to MP4';
-            }
-        }
-
-        document.getElementById('addAnimeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Adding...';
-            
-            try {
-                const channelId = document.getElementById('channelSelect').value;
-                const title = document.getElementById('animeTitle').value.trim();
-                const playOption = document.querySelector('input[name="playOption"]:checked').value;
-                
-                // Collect episodes
-                const episodes = [];
-                const episodeRows = document.querySelectorAll('.episode-row');
-                
-                for (const row of episodeRows) {
-                    const episodeNum = row.querySelector('.episode-number').value;
-                    const mp4Link = row.querySelector('.episode-link').value.trim();
-                    
-                    if (episodeNum && mp4Link) {
-                        episodes.push({
-                            episode: parseInt(episodeNum),
-                            mp4Link: mp4Link
-                        });
-                    }
-                }
-                
-                if (episodes.length === 0) {
-                    showMessage('Please add at least one episode', 'error');
-                    return;
-                }
-                
-                // Validate URLs
-                for (const episode of episodes) {
-                    try {
-                        new URL(episode.mp4Link);
-                    } catch {
-                        showMessage(`Invalid URL for Episode ${episode.episode}`, 'error');
-                        return;
-                    }
-                }
-                
-                const response = await fetch('/api/add-anime', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        channelId,
-                        title,
-                        episodes,
-                        playImmediately: playOption === 'immediately',
-                        playAfterCurrentAnime: playOption === 'afterCurrent'
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showMessage(result.message, 'success');
-                    document.getElementById('addAnimeForm').reset();
-                    episodeCount = 0;
-                    document.getElementById('episodesContainer').innerHTML = '';
-                    document.getElementById('linksContainer').style.display = 'none';
-                    addEpisodeRow();
-                    loadChannelQueue(); // Refresh queue
-                } else {
-                    showMessage(result.error, 'error');
-                }
-                
-            } catch (error) {
-                showMessage('Failed to add anime. Please try again.', 'error');
-                console.error('Error:', error);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Add Anime to Queue';
+                resultDiv.innerHTML = `<p class="error">Error resolving link: ${error.message}</p>`;
             }
         });
 
-        function showMessage(text, type) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = text;
-            messageDiv.className = `message ${type}`;
-            messageDiv.style.display = 'block';
-            
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-            }, 5000);
-        }
+        // Add Anime Form
+        document.getElementById('addAnimeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const channelId = document.getElementById('channelId').value;
+            const title = document.getElementById('animeTitle').value.trim();
+            const playImmediately = document.getElementById('playImmediately').checked;
+            const playAfterCurrentAnime = document.getElementById('playAfterCurrentAnime').checked;
+            const episodes = Array.from(document.querySelectorAll('.episode-entry')).map(entry => ({
+                episode: entry.querySelector('input[name="episode"]').value,
+                mp4Link: entry.querySelector('input[name="mp4Link"]').value.trim()
+            }));
+            const resultDiv = document.getElementById('addAnimeResult');
+
+            try {
+                const response = await fetch('/api/add-anime', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channelId, title, episodes, playImmediately, playAfterCurrentAnime })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `<p class="success">${data.message}</p>`;
+                    document.getElementById('addAnimeForm').reset();
+                    document.getElementById('episodesContainer').innerHTML = `
+                        <div class="episode-entry flex space-x-2">
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium">Episode Number</label>
+                                <input type="number" name="episode" class="mt-1 p-2 w-full bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 1" min="1" required>
+                            </div>
+                            <div class="flex-3">
+                                <label class="block text-sm font-medium">MP4 Link</label>
+                                <input type="text" name="mp4Link" class="mt-1 p-2 w-full bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., https://vault-12.kwik.cx/..." required>
+                            </div>
+                            <button type="button" class="remove-episode mt-7 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Remove</button>
+                        </div>
+                    `;
+                    bindRemoveEpisodeButtons();
+                } else {
+                    resultDiv.innerHTML = `<p class="error">${data.error}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error adding anime: ${error.message}</p>`;
+            }
+        });
+
+        // Validate mutually exclusive checkboxes
+        document.getElementById('playImmediately').addEventListener('change', (e) => {
+            if (e.target.checked) {
+                document.getElementById('playAfterCurrentAnime').checked = false;
+            }
+        });
+        document.getElementById('playAfterCurrentAnime').addEventListener('change', (e) => {
+            if (e.target.checked) {
+                document.getElementById('playImmediately').checked = false;
+            }
+        });
+
+        // Fetch and display queue
+        document.getElementById('queueChannelId').addEventListener('change', async () => {
+            const channelId = document.getElementById('queueChannelId').value;
+            const queueContainer = document.getElementById('queueContainer');
+            const playAgainButton = document.getElementById('playAgain');
+            const queueResult = document.getElementById('queueResult');
+
+            if (!channelId) {
+                queueContainer.innerHTML = '';
+                playAgainButton.classList.add('hidden');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/queue/${channelId}`);
+                const data = await response.json();
+                
+                queueContainer.innerHTML = `
+                    <h3 class="text-lg font-semibold mb-2">Current Queue for ${data.channelName}</h3>
+                    <p>Currently Playing: ${data.currentlyPlaying} Episode ${data.currentEpisode}</p>
+                    <p>Total Anime in Queue: ${data.totalAnime}</p>
+                    <p>Status: ${data.isFinished ? 'Finished' : 'Playing'}</p>
+                    <ul class="space-y-2 mt-4">
+                        ${data.queue.map(item => `
+                            <li class="flex items-center justify-between bg-gray-700 p-2 rounded">
+                                <span>${item.position}. ${item.title} (${item.episodeCount} episodes) - ${item.status}</span>
+                                <input type="number" data-title="${item.title}" class="new-position w-20 p-1 bg-gray-600 rounded border border-gray-500" min="1" max="${data.totalAnime}" value="${item.position}" ${item.status === 'currently_playing' ? 'disabled' : ''}>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                playAgainButton.classList.toggle('hidden', !data.isFinished);
+
+                // Bind position change handlers
+                document.querySelectorAll('.new-position').forEach(input => {
+                    input.addEventListener('change', async (e) => {
+                        const animeTitle = e.target.dataset.title;
+                        const newPosition = e.target.value;
+                        
+                        try {
+                            const response = await fetch('/api/reorder-queue', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ channelId, animeTitle, newPosition })
+                            });
+                            const data = await response.json();
+                            
+                            queueResult.innerHTML = data.success 
+                                ? `<p class="success">${data.message}</p>`
+                                : `<p class="error">${data.error}</p>`;
+                            
+                            // Refresh queue
+                            document.getElementById('queueChannelId').dispatchEvent(new Event('change'));
+                        } catch (error) {
+                            queueResult.innerHTML = `<p class="error">Error reordering queue: ${error.message}</p>`;
+                        }
+                    });
+                });
+            } catch (error) {
+                queueContainer.innerHTML = `<p class="error">Error fetching queue: ${error.message}</p>`;
+            }
+        });
+
+        // Play Again Button
+        document.getElementById('playAgain').addEventListener('click', async () => {
+            const channelId = document.getElementById('queueChannelId').value;
+            const queueResult = document.getElementById('queueResult');
+
+            try {
+                const response = await fetch(`/api/play-again/${channelId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                
+                queueResult.innerHTML = data.success 
+                    ? `<p class="success">${data.message}</p>`
+                    : `<p class="error">${data.error}</p>`;
+                
+                // Refresh queue
+                document.getElementById('queueChannelId').dispatchEvent(new Event('change'));
+            } catch (error) {
+                queueResult.innerHTML = `<p class="error">Error restarting playlist: ${error.message}</p>`;
+            }
+        });
+
+        // Initialize
+        fetchChannels();
+        bindRemoveEpisodeButtons();
     </script>
 </body>
 </html>

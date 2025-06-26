@@ -27,8 +27,23 @@ try {
     channel1: { 
       name: 'Anitaku TV 1', 
       playlist: [ 
-        { title: 'Blue Lock', start: 1, end: 24 }, 
-        { title: 'Erased', start: 1, end: 12 } 
+        { 
+          title: 'Blue Lock', 
+          episodes: [
+            { episode: 1, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' },
+            { episode: 2, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' },
+            { episode: 3, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' }
+            // Add more episodes as needed
+          ]
+        }, 
+        { 
+          title: 'Erased', 
+          episodes: [
+            { episode: 1, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' },
+            { episode: 2, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' }
+            // Add more episodes as needed
+          ]
+        } 
       ], 
       schedule: [],
       currentEpisode: null,
@@ -38,7 +53,14 @@ try {
     channel2: { 
       name: 'Anitaku TV 2', 
       playlist: [ 
-        { title: 'Eminence in Shadow', start: 1, end: 20 } 
+        { 
+          title: 'Eminence in Shadow', 
+          episodes: [
+            { episode: 1, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' },
+            { episode: 2, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' }
+            // Add more episodes as needed
+          ]
+        } 
       ], 
       schedule: [],
       currentEpisode: null,
@@ -48,7 +70,14 @@ try {
     channel3: { 
       name: 'Anitaku TV 3', 
       playlist: [ 
-        { title: 'Attack on Titan', start: 1, end: 25 } 
+        { 
+          title: 'Attack on Titan', 
+          episodes: [
+            { episode: 1, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' },
+            { episode: 2, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' }
+            // Add more episodes as needed
+          ]
+        } 
       ], 
       schedule: [],
       currentEpisode: null,
@@ -58,7 +87,14 @@ try {
     channel4: { 
       name: 'Anitaku TV 4', 
       playlist: [ 
-        { title: 'One Piece', start: 1, end: 35 } 
+        { 
+          title: 'Your Forma', 
+          episodes: [
+            { episode: 1, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' },
+            { episode: 2, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/61f1515945c0f7daddfc174b8561fe2bc3e6179e4ef26c51425e5efdccc3b332?file=AnimePahe_Your_Forma_-_12_360p_B-Global.mp4' }
+            // Add more episodes as needed
+          ]
+        } 
       ], 
       schedule: [],
       currentEpisode: null,
@@ -68,7 +104,14 @@ try {
     channel5: { 
       name: 'Anitaku TV 5', 
       playlist: [ 
-        { title: 'Redo Of Healer', start: 1, end: 12 } 
+        { 
+          title: 'Redo Of Healer', 
+          episodes: [
+            { episode: 1, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' },
+            { episode: 2, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' }
+            // Add more episodes as needed
+          ]
+        } 
       ], 
       schedule: [],
       currentEpisode: null,
@@ -78,7 +121,14 @@ try {
     channel6: { 
       name: 'Anitaku TV 6', 
       playlist: [ 
-        { title: 'Onagaku Shoujo', start: 1, end: 13 } 
+        { 
+          title: 'Onagaku Shoujo', 
+          episodes: [
+            { episode: 1, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' },
+            { episode: 2, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' }
+            // Add more episodes as needed
+          ]
+        } 
       ], 
       schedule: [],
       currentEpisode: null,
@@ -124,6 +174,12 @@ async function getVideoDuration(url) {
   });
 }
 
+// Get episode MP4 link from playlist
+function getEpisodeMp4(animeEntry, episodeNumber) {
+  const episode = animeEntry.episodes.find(ep => ep.episode === episodeNumber);
+  return episode ? episode.mp4Link : null;
+}
+
 // Generate dynamic schedule that matches current state
 async function generateDynamicSchedule(channelId, channelConfig, currentEpisodeInfo) {
   const schedule = [];
@@ -149,24 +205,25 @@ async function generateDynamicSchedule(channelId, channelConfig, currentEpisodeI
   
   // Generate next 10 episodes for schedule
   for (let i = 0; i < 10; i++) {
-    const entry = channelConfig.playlist[tempIndex];
-    if (!entry) break;
+    const animeEntry = channelConfig.playlist[tempIndex];
+    if (!animeEntry) break;
 
-    if (tempEp > entry.end) {
+    // Check if episode exists
+    if (tempEp > animeEntry.episodes.length) {
       tempIndex++;
       if (tempIndex >= channelConfig.playlist.length) tempIndex = 0;
-      tempEp = channelConfig.playlist[tempIndex].start;
+      tempEp = 1; // Start from episode 1 of next anime
       continue;
     }
 
-    const url = await getEpisodeMp4(entry.title, tempEp);
+    const url = getEpisodeMp4(animeEntry, tempEp);
     if (url) {
       const duration = await getVideoDuration(url);
       const startTime = new Date(currentTime);
       const endTime = new Date(currentTime.getTime() + duration);
       
       schedule.push({
-        title: `${entry.title} Episode ${tempEp}`,
+        title: `${animeEntry.title} Episode ${tempEp}`,
         startTime: formatWATTime(startTime),
         endTime: formatWATTime(endTime),
         current: false
@@ -183,21 +240,6 @@ async function generateDynamicSchedule(channelId, channelConfig, currentEpisodeI
 
 function wait(ms) { 
   return new Promise(resolve => setTimeout(resolve, ms)); 
-} 
-
-async function getEpisodeMp4(anime, ep) { 
-  try {
-    const url = `https://newservers-api.hf.space/api/episode?anime=${encodeURIComponent(anime)}&ep=${ep}`; 
-    const data = await axios.get(url, { timeout: 15000 }).then(r => r.data); 
-    const dl = data?.links?.sub?.['360p_download']; 
-    if (!dl) return null; 
-    
-    const response = await axios.get(`https://newservers-api.hf.space/resolvex?url=${dl}`, { timeout: 15000 });
-    return response.data?.mp4Link || null;
-  } catch (error) {
-    console.error(`Error getting episode ${anime} ${ep}:`, error.message);
-    return null;
-  }
 } 
 
 function startFFmpeg(channelId, inputUrl, outputDir, episodeNumber, slotId, onExit, onReady) { 
@@ -279,7 +321,7 @@ function switchActiveStream(channelOutput, fromSlot, toSlot) {
 async function setupChannel(channelId, channelConfig) {
   const state = {
     index: 0,
-    ep: channelConfig.playlist[0].start,
+    ep: 1, // Start from episode 1
     currentProcess: null,
     nextProcess: null,
     anime: channelConfig.playlist[0].title,
@@ -297,14 +339,14 @@ async function setupChannel(channelId, channelConfig) {
   fs.mkdirSync(channelOutput, { recursive: true });
 
   function getNextEpisodeInfo() {
-    const entry = channelConfig.playlist[state.index];
+    const animeEntry = channelConfig.playlist[state.index];
     let nextEp = state.ep + 1;
     let nextIndex = state.index;
     
-    if (nextEp > entry.end) {
+    if (nextEp > animeEntry.episodes.length) {
       nextIndex++;
       if (nextIndex >= channelConfig.playlist.length) nextIndex = 0;
-      nextEp = channelConfig.playlist[nextIndex].start;
+      nextEp = 1; // Start from episode 1 of next anime
     }
     
     return {
@@ -316,10 +358,11 @@ async function setupChannel(channelId, channelConfig) {
 
   async function preloadNextEpisode() {
     const nextInfo = getNextEpisodeInfo();
-    const url = await getEpisodeMp4(nextInfo.anime, nextInfo.ep);
+    const animeEntry = channelConfig.playlist[nextInfo.index];
+    const url = getEpisodeMp4(animeEntry, nextInfo.ep);
     
     if (!url) {
-      console.log(`[${channelId}] ❌ Failed to preload ${nextInfo.anime} Episode ${nextInfo.ep}`);
+      console.log(`[${channelId}] ❌ Failed to preload ${nextInfo.anime} Episode ${nextInfo.ep} - no MP4 link found`);
       return false;
     }
 
@@ -356,12 +399,12 @@ async function setupChannel(channelId, channelConfig) {
       return;
     }
 
-    const entry = channelConfig.playlist[state.index];
-    console.log(`🎬 [${channelId}] Playing ${entry.title} Episode ${state.ep} in slot ${state.activeSlot}`);
+    const animeEntry = channelConfig.playlist[state.index];
+    console.log(`🎬 [${channelId}] Playing ${animeEntry.title} Episode ${state.ep} in slot ${state.activeSlot}`);
 
-    const url = await getEpisodeMp4(entry.title, state.ep);
+    const url = getEpisodeMp4(animeEntry, state.ep);
     if (!url) {
-      console.log(`[${channelId}] ❌ Failed to get URL for ${entry.title} Episode ${state.ep}`);
+      console.log(`[${channelId}] ❌ No MP4 link found for ${animeEntry.title} Episode ${state.ep}`);
       state.retryCount++;
       if (state.retryCount < 3) {
         console.log(`[${channelId}] Retrying in 5 seconds... (${state.retryCount}/3)`);
@@ -383,7 +426,7 @@ async function setupChannel(channelId, channelConfig) {
     const endTime = new Date(startTime.getTime() + duration);
     
     // Update channel current episode info
-    channelConfig.currentEpisode = `${entry.title} Episode ${state.ep}`;
+    channelConfig.currentEpisode = `${animeEntry.title} Episode ${state.ep}`;
     channelConfig.currentStartTime = startTime;
     channelConfig.currentEndTime = endTime;
 
@@ -397,7 +440,7 @@ async function setupChannel(channelId, channelConfig) {
     // Save updated channel info
     fs.writeFileSync(channelsFile, JSON.stringify(channels, null, 2));
 
-    console.log(`▶️  [${channelId}] Playing ${entry.title} Episode ${state.ep} (${Math.round(duration/60000)}min) in slot ${state.activeSlot}`);
+    console.log(`▶️  [${channelId}] Playing ${animeEntry.title} Episode ${state.ep} (${Math.round(duration/60000)}min) in slot ${state.activeSlot}`);
 
     // Kill existing current process if any
     if (state.currentProcess) {
@@ -461,15 +504,15 @@ async function setupChannel(channelId, channelConfig) {
   }
 
   function moveToNextEpisode() {
-    const entry = channelConfig.playlist[state.index];
+    const animeEntry = channelConfig.playlist[state.index];
     state.ep++;
     
-    if (state.ep > entry.end) {
+    if (state.ep > animeEntry.episodes.length) {
       state.index++;
       if (state.index >= channelConfig.playlist.length) {
         state.index = 0;
       }
-      state.ep = channelConfig.playlist[state.index].start;
+      state.ep = 1; // Start from episode 1 of next anime
       console.log(`📺 [${channelId}] Moving to next anime: ${channelConfig.playlist[state.index].title}`);
     }
 
@@ -490,11 +533,24 @@ async function setupChannel(channelId, channelConfig) {
 
 // Route to add new anime 
 app.post('/api/add-anime', async (req, res) => { 
-  const { channelId, title, start, end } = req.body; 
+  const { channelId, title, episodes } = req.body; 
   if (!channels[channelId]) { 
     return res.status(400).json({ error: 'Invalid channel ID' }); 
   } 
-  channels[channelId].playlist.push({ title, start: parseInt(start), end: parseInt(end) }); 
+  
+  // Validate episodes format
+  if (!Array.isArray(episodes) || episodes.length === 0) {
+    return res.status(400).json({ error: 'Episodes must be an array with at least one episode' });
+  }
+  
+  // Validate each episode has required fields
+  for (const ep of episodes) {
+    if (!ep.episode || !ep.mp4Link) {
+      return res.status(400).json({ error: 'Each episode must have episode number and mp4Link' });
+    }
+  }
+  
+  channels[channelId].playlist.push({ title, episodes }); 
   
   // Regenerate schedule
   const currentInfo = channels[channelId].currentStartTime ? {
@@ -507,6 +563,42 @@ app.post('/api/add-anime', async (req, res) => {
   fs.writeFileSync(channelsFile, JSON.stringify(channels, null, 2)); 
   res.json({ success: true }); 
 }); 
+
+// Route to add episode to existing anime
+app.post('/api/add-episode', async (req, res) => {
+  const { channelId, animeTitle, episode, mp4Link } = req.body;
+  
+  if (!channels[channelId]) {
+    return res.status(400).json({ error: 'Invalid channel ID' });
+  }
+  
+  const animeEntry = channels[channelId].playlist.find(anime => anime.title === animeTitle);
+  if (!animeEntry) {
+    return res.status(400).json({ error: 'Anime not found in channel playlist' });
+  }
+  
+  // Check if episode already exists
+  const existingEpisode = animeEntry.episodes.find(ep => ep.episode === episode);
+  if (existingEpisode) {
+    return res.status(400).json({ error: 'Episode already exists' });
+  }
+  
+  animeEntry.episodes.push({ episode: parseInt(episode), mp4Link });
+  
+  // Sort episodes by episode number
+  animeEntry.episodes.sort((a, b) => a.episode - b.episode);
+  
+  // Regenerate schedule
+  const currentInfo = channels[channelId].currentStartTime ? {
+    title: channels[channelId].currentEpisode,
+    startTime: channels[channelId].currentStartTime,
+    endTime: channels[channelId].currentEndTime
+  } : null;
+  
+  channels[channelId].schedule = await generateDynamicSchedule(channelId, channels[channelId], currentInfo);
+  fs.writeFileSync(channelsFile, JSON.stringify(channels, null, 2));
+  res.json({ success: true });
+});
 
 app.get('/watch/:channelId', (req, res) => { 
   const filePath = path.join(publicDir, 'channel.html'); 
@@ -547,6 +639,22 @@ app.get('/api/status', (req, res) => {
   res.json(status);
 });
 
+// Route to get all channels and their playlists
+app.get('/api/channels', (req, res) => {
+  const channelData = {};
+  for (const [channelId, config] of Object.entries(channels)) {
+    channelData[channelId] = {
+      name: config.name,
+      playlist: config.playlist.map(anime => ({
+        title: anime.title,
+        episodeCount: anime.episodes.length,
+        episodes: anime.episodes
+      }))
+    };
+  }
+  res.json(channelData);
+});
+
 // Launch all channels 
 for (const [id, config] of Object.entries(channels)) { 
   setupChannel(id, config); 
@@ -565,4 +673,5 @@ app.listen(PORT, () => {
   }); 
   console.log(`- http://localhost:${PORT}/add-anime`); 
   console.log(`- http://localhost:${PORT}/api/status`); 
+  console.log(`- http://localhost:${PORT}/api/channels`); 
 });

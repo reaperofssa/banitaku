@@ -187,12 +187,12 @@ function wait(ms) {
 
 async function getEpisodeMp4(anime, ep) { 
   try {
-    const url = `https://txtorg-anihx.hf.space/api/episode?anime=${encodeURIComponent(anime)}&ep=${ep}`; 
+    const url = `https://newservers-api.hf.space/api/episode?anime=${encodeURIComponent(anime)}&ep=${ep}`; 
     const data = await axios.get(url, { timeout: 15000 }).then(r => r.data); 
     const dl = data?.links?.sub?.['360p_download']; 
     if (!dl) return null; 
     
-    const response = await axios.get(`https://txtorg-anihx.hf.space/resolvex?url=${dl}`, { timeout: 15000 });
+    const response = await axios.get(`https://newservers-api.hf.space/resolvex?url=${dl}`, { timeout: 15000 });
     return response.data?.mp4Link || null;
   } catch (error) {
     console.error(`Error getting episode ${anime} ${ep}:`, error.message);

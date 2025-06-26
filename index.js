@@ -606,20 +606,16 @@ app.get('/watch/:channelId', (req, res) => {
 }); 
 
 // Route to get channel schedule 
-app.get('/api/schedule/:channelId', (req, res) => { 
-  const channelId = req.params.channelId; 
-  if (!channels[channelId]) { 
-    return res.status(400).json({ error: 'Invalid channel ID' }); 
-  } 
-  
-  // Return fresh schedule with current episode info
-  res.json({
-    schedule: channels[channelId].schedule,
-    currentEpisode: channels[channelId].currentEpisode,
-    currentStartTime: channels[channelId].currentStartTime,
-    currentEndTime: channels[channelId].currentEndTime
-  }); 
-}); 
+app.get('/api/schedule/:channelId', (req, res) => {
+  const channelId = req.params.channelId;
+
+  if (!channels[channelId]) {
+    return res.status(400).json({ error: 'Invalid channel ID' });
+  }
+
+  // ✅ Just send the schedule array
+  res.json(channels[channelId].schedule);
+});
 
 // Route to get current status of all channels
 app.get('/api/status', (req, res) => {

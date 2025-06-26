@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Anime - AnitakuX</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .episodes-container {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            background: #f9f9f9;
+        }
+
+        .episode-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .episode-row input {
+            margin-bottom: 0;
+        }
+
+        .episode-number {
+            width: 100px;
+            flex-shrink: 0;
+        }
+
+        .episode-link {
+            flex-grow: 1;
+        }
+
+        .remove-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .remove-btn:hover {
+            background: #ff3742;
+        }
+
+        .add-episode-btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .add-episode-btn:hover {
+            background: #27ae60;
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .queue-info {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .queue-info h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .current-queue {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .queue-item {
+            background: white;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 4px solid #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← Back to Channels</a>
+        
+        <h1>Add New Anime</h1>
+        
+        <div id="message" class="message"></div>
+        
+        <div id="queueInfo" class="queue-info" style="display: none;">
+            <h3>Current Queue</h3>
+            <div id="currentQueue" class="current-queue"></div>
+        </div>
+
+        <form id="addAnimeForm">
+            <div class="form-group">
+                <label for="channelSelect">Select Channel:</label>
+                <select id="channelSelect" required>
+                    <option value="">Choose a channel...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="animeTitle">Anime Title:</label>
+                <input type="text" id="animeTitle" required placeholder="Enter anime title...">
+            </div>
+
+            <div class="form-group">
+                <label>Episodes:</label>
+                <div class="episodes-container">
+                    <div id="episodesContainer">
+                        <!-- Episodes will be added here -->
+                    </div>
+                    <button type="button" class="add-episode-btn" onclick="addEpisodeRow()">
+                        + Add Episode
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                Add Anime to Queue
+            </button>
+        </form>
+    </div>
+
+    <script>
+        let episodeCount = 0;
+
+        // Load channels on page load
+        document.addEventListener('DOMContentLoaded', loadChannels);
+
+        async function loadChannels() {
+            try {
+                const response = await fetch('/api/channels');
+                const channels = await response.json();
+                
+                const select = document.getElementById('channelSelect');
+                select.innerHTML = '<option value="">Choose a channel...</option>';
+                
+                for (const [id, channel] of Object.entries(channels)) {
+                    const option = document.createElement('option');
+                    option.value = id;
+                    option.textContent = channel.name;
+                    select.appendChild(option);
+                }
+                
+                // Add first episode row
+                addEpisodeRow();
+                
+                // Load queue when channel changes
+                select.addEventListener('change', loadChannelQueue);
+                
+            } catch (error) {
+                showMessage('Failed to load channels', 'error');
+            }
+        }
+
+        async function loadChannelQueue() {
+            const channelId = document.getElementById('channelSelect').value;
+            const queueInfo = document.getElementById('queueInfo');
+            
+            if (!channelId) {
+                queueInfo.style.display = 'none';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/queue/${channelId}`);
+                const data = await response.json();
+                
+                const queueContainer = document.getElementById('currentQueue');
+                queueContainer.innerHTML = '';
+                
+                if (data.queue && data.queue.length > 0) {
+                    data.queue.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'queue-item';
+                        div.innerHTML = `
+                            <strong>${item.position}. ${item.title}</strong> 
+                            (${item.episodeCount} episodes) 
+                            <span style="color: ${item.status === 'currently_playing' ? '#e74c3c' : '#7f8c8d'}">
+                                ${item.status === 'currently_playing' ? '▶ Playing' : '⏳ Queued'}
+                            </span>
+                        `;
+                        queueContainer.appendChild(div);
+                    });
+                    queueInfo.style.display = 'block';
+                } else {
+                    queueInfo.style.display = 'none';
+                }
+                
+            } catch (error) {
+                console.error('Failed to load queue:', error);
+            }
+        }
+
+        function addEpisodeRow() {
+            episodeCount++;
+            const container = document.getElementById('episodesContainer');
+            
+            const episodeRow = document.createElement('div');
+            episodeRow.className = 'episode-row';
+            episodeRow.innerHTML = `
+                <input type="number" class="episode-number" placeholder="Ep #" min="1" required>
+                <input type="url" class="episode-link" placeholder="MP4 Link (https://...)" required>
+                <button type="button" class="remove-btn" onclick="removeEpisodeRow(this)">Remove</button>
+            `;
+            
+            container.appendChild(episodeRow);
+            
+            // Auto-fill episode number
+            const episodeInput = episodeRow.querySelector('.episode-number');
+            episodeInput.value = episodeCount;
+        }
+
+        function removeEpisodeRow(button) {
+            const rows = document.querySelectorAll('.episode-row');
+            if (rows.length > 1) {
+                button.parentElement.remove();
+                renumberEpisodes();
+            } else {
+                showMessage('At least one episode is required', 'error');
+            }
+        }
+
+        function renumberEpisodes() {
+            const rows = document.querySelectorAll('.episode-row');
+            rows.forEach((row, index) => {
+                const episodeInput = row.querySelector('.episode-number');
+                if (!episodeInput.value) {
+                    episodeInput.value = index + 1;
+                }
+            });
+        }
+
+        document.getElementById('addAnimeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Adding...';
+            
+            try {
+                const channelId = document.getElementById('channelSelect').value;
+                const title = document.getElementById('animeTitle').value.trim();
+                
+                // Collect episodes
+                const episodes = [];
+                const episodeRows = document.querySelectorAll('.episode-row');
+                
+                for (const row of episodeRows) {
+                    const episodeNum = row.querySelector('.episode-number').value;
+                    const mp4Link = row.querySelector('.episode-link').value.trim();
+                    
+                    if (episodeNum && mp4Link) {
+                        episodes.push({
+                            episode: parseInt(episodeNum),
+                            mp4Link: mp4Link
+                        });
+                    }
+                }
+                
+                if (episodes.length === 0) {
+                    showMessage('Please add at least one episode', 'error');
+                    return;
+                }
+                
+                // Validate URLs
+                for (const episode of episodes) {
+                    try {
+                        new URL(episode.mp4Link);
+                    } catch {
+                        showMessage(`Invalid URL for Episode ${episode.episode}`, 'error');
+                        return;
+                    }
+                }
+                
+                const response = await fetch('/api/add-anime', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        channelId,
+                        title,
+                        episodes
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage(result.message, 'success');
+                    document.getElementById('addAnimeForm').reset();
+                    episodeCount = 0;
+                    document.getElementById('episodesContainer').innerHTML = '';
+                    addEpisodeRow();
+                    loadChannelQueue(); // Refresh queue
+                } else {
+                    showMessage(result.error, 'error');
+                }
+                
+            } catch (error) {
+                showMessage('Failed to add anime. Please try again.', 'error');
+                console.error('Error:', error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Add Anime to Queue';
+            }
+        });
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

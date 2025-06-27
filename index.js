@@ -84,9 +84,9 @@ try {
       name: 'Anitaku TV 4',
       playlist: [
         {
-          title: 'Your Forma',
+          title: 'Squid Game',
           episodes: [
-            { episode: 1, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' },
+            { episode: 1, mp4Link: 'https://valiw.hakunaymatata.com/resource/1c2360141004ae7653dae900a2b5abed.mp4?auth_key=1751011264-0-0-ea0da19233216cf088a2a542d8cee173' },
             { episode: 2, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/61f1515945c0f7daddfc174b8561fe2bc3e6179e4ef26c51425e5efdccc3b332?file=AnimePahe_Your_Forma_-_12_360p_B-Global.mp4' }
           ]
         }

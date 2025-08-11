@@ -84,9 +84,9 @@ try {
       name: 'Anitaku TV 4',
       playlist: [
         {
-          title: 'Squid Game',
+          title: 'Your Forma',
           episodes: [
-            { episode: 1, mp4Link: 'https://valiw.hakunaymatata.com/resource/1c2360141004ae7653dae900a2b5abed.mp4?auth_key=1751011264-0-0-ea0da19233216cf088a2a542d8cee173' },
+            { episode: 1, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/9e4bf99fca838799307e409c951b3cb10023abffa71b075f681059b33485218d?file=AnimePahe_Your_Forma_-_13_360p_B-Global.mp4' },
             { episode: 2, mp4Link: 'https://vault-99.kwik.cx/mp4/99/01/61f1515945c0f7daddfc174b8561fe2bc3e6179e4ef26c51425e5efdccc3b332?file=AnimePahe_Your_Forma_-_12_360p_B-Global.mp4' }
           ]
         }
@@ -204,7 +204,7 @@ async function generateDynamicSchedule(channelId, channelConfig, currentEpisodeI
     // Check if episode exists
     if (tempEp > animeEntry.episodes.length) {
       tempIndex++;
-      if (tempIndex >= channelConfig.playlist.length) break;
+      if (tempIndex >= channelConfig.playlist.length) tempIndex = 0;
       tempEp = 1; // Start from episode 1 of next anime
       continue;
     }
@@ -229,6 +229,10 @@ async function generateDynamicSchedule(channelId, channelConfig, currentEpisodeI
   }
 
   return schedule;
+}
+
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function startFFmpeg(channelId, inputUrl, outputDir, episodeNumber, slotId, onExit, onReady) {
@@ -313,13 +317,12 @@ async function setupChannel(channelId, channelConfig) {
     ep: 1, // Start from episode 1
     currentProcess: null,
     nextProcess: null,
-    anime: channelConfig.playlist[0]?.title || '',
+    anime: channelConfig.playlist[0].title,
     activeSlot: 'A', // A or B
     nextSlot: 'B',
     isPlaying: false,
     retryCount: 0,
-    preloadReady: false,
-    isFinished: false // Track if playlist is finished
+    preloadReady: false
   };
 
   channelStates[channelId] = state;
@@ -335,9 +338,7 @@ async function setupChannel(channelId, channelConfig) {
 
     if (nextEp > animeEntry.episodes.length) {
       nextIndex++;
-      if (nextIndex >= channelConfig.playlist.length) {
-        return null; // Playlist finished
-      }
+      if (nextIndex >= channelConfig.playlist.length) nextIndex = 0;
       nextEp = 1; // Start from episode 1 of next anime
     }
 
@@ -349,15 +350,7 @@ async function setupChannel(channelId, channelConfig) {
   }
 
   async function preloadNextEpisode() {
-    if (state.isFinished) return false;
-
     const nextInfo = getNextEpisodeInfo();
-    if (!nextInfo) {
-      console.log(`[${channelId}] ❌ Playlist finished, waiting for new episodes`);
-      state.isFinished = true;
-      return false;
-    }
-
     const animeEntry = channelConfig.playlist[nextInfo.index];
     const url = getEpisodeMp4(animeEntry, nextInfo.ep);
 
@@ -399,18 +392,7 @@ async function setupChannel(channelId, channelConfig) {
       return;
     }
 
-    if (state.isFinished) {
-      console.log(`[${channelId}] Playlist finished, waiting for new episodes`);
-      return;
-    }
-
     const animeEntry = channelConfig.playlist[state.index];
-    if (!animeEntry) {
-      console.log(`[${channelId}] No anime available in playlist`);
-      state.isFinished = true;
-      return;
-    }
-
     console.log(`🎬 [${channelId}] Playing ${animeEntry.title} Episode ${state.ep} in slot ${state.activeSlot}`);
 
     const url = getEpisodeMp4(animeEntry, state.ep);
@@ -516,19 +498,12 @@ async function setupChannel(channelId, channelConfig) {
 
   function moveToNextEpisode() {
     const animeEntry = channelConfig.playlist[state.index];
-    if (!animeEntry) {
-      state.isFinished = true;
-      return;
-    }
-
     state.ep++;
 
     if (state.ep > animeEntry.episodes.length) {
       state.index++;
       if (state.index >= channelConfig.playlist.length) {
-        state.isFinished = true;
-        console.log(`[${channelId}] Playlist finished, waiting for new episodes`);
-        return;
+        state.index = 0;
       }
       state.ep = 1; // Start from episode 1 of next anime
       console.log(`📺 [${channelId}] Moving to next anime: ${channelConfig.playlist[state.index].title}`);
@@ -542,61 +517,12 @@ async function setupChannel(channelId, channelConfig) {
   // Initial schedule generation
   channelConfig.schedule = await generateDynamicSchedule(channelId, channelConfig, null);
 
-  // Start the first episode if playlist exists
-  if (channelConfig.playlist.length > 0) {
-    playEpisode();
-  }
+  // Start the first episode
+  playEpisode();
 
   // Serve HLS files
   app.use(`/hls/${channelId}`, express.static(channelOutput));
 }
-
-// Route to play playlist again
-app.post('/api/play-again/:channelId', async (req, res) => {
-  try {
-    const channelId = req.params.channelId;
-    if (!channels[channelId]) {
-      return res.status(400).json({ error: 'Invalid channel ID' });
-    }
-
-    const state = channelStates[channelId];
-    state.index = 0;
-    state.ep = 1;
-    state.isFinished = false;
-    state.isPlaying = false;
-    state.anime = channels[channelId].playlist[0]?.title || '';
-    
-    // Stop current playback
-    if (state.currentProcess) {
-      state.currentProcess.kill('SIGTERM');
-    }
-    if (state.nextProcess) {
-      state.nextProcess.kill('SIGTERM');
-    }
-
-    // Reset current episode info
-    channels[channelId].currentEpisode = null;
-    channels[channelId].currentStartTime = null;
-    channels[channelId].currentEndTime = null;
-
-    // Regenerate schedule
-    channels[channelId].schedule = await generateDynamicSchedule(channelId, channels[channelId], null);
-    
-    // Save changes
-    fs.writeFileSync(channelsFile, JSON.stringify(channels, null, 2));
-
-    // Start playing from beginning
-    setTimeout(() => playEpisode(), 1000);
-
-    res.json({
-      success: true,
-      message: `Restarted playlist for ${channels[channelId].name}`
-    });
-  } catch (error) {
-    console.error('Error restarting playlist:', error);
-    res.status(500).json({ error: 'Internal server error while restarting playlist' });
-  }
-});
 
 // Route to add new anime
 app.get('/add-anime', (req, res) => {
@@ -640,6 +566,17 @@ app.post('/api/add-anime', async (req, res) => {
       }
     }
 
+    // Check if anime already exists in this channel
+    const existingAnime = channels[channelId].playlist.find(
+      anime => anime.title.toLowerCase() === title.toLowerCase().trim()
+    );
+
+    if (existingAnime) {
+      return res.status(400).json({
+        error: 'Anime with this title already exists in this channel'
+      });
+    }
+
     // Validate mutually exclusive flags
     if (playImmediately && playAfterCurrentAnime) {
       return res.status(400).json({
@@ -674,7 +611,6 @@ app.post('/api/add-anime', async (req, res) => {
       state.ep = 1;
       state.anime = title.trim();
       state.isPlaying = false; // Trigger immediate playback
-      state.isFinished = false;
       console.log(`📺 [${channelId}] Prioritizing "${title}" to play immediately`);
 
       // Stop current playback to switch to new anime
@@ -694,13 +630,6 @@ app.post('/api/add-anime', async (req, res) => {
       channels[channelId].playlist.push(newAnime);
       console.log(`📺 [${channelId}] Added anime "${title}" with ${sortedEpisodes.length} episodes to end of queue`);
       queuePosition = channels[channelId].playlist.length;
-    }
-
-    // If channel was finished, restart playback
-    if (state.isFinished) {
-      state.isFinished = false;
-      state.isPlaying = false;
-      setTimeout(() => playEpisode(), 1000);
     }
 
     // Regenerate schedule with proper async handling
@@ -782,20 +711,12 @@ app.post('/api/add-episode', async (req, res) => {
       // If adding to current anime and playImmediately is true, set to play this episode next
       state.ep = episodeNum - 1; // Set to play this episode next
       state.isPlaying = false; // Trigger immediate playback
-      state.isFinished = false;
       console.log(`📺 [${channelId}] Prioritizing Episode ${episodeNum} of "${animeTitle}" to play next`);
 
       // Stop current playback to switch to new episode
       if (state.currentProcess) {
         state.currentProcess.kill('SIGTERM');
       }
-      setTimeout(() => playEpisode(), 1000);
-    }
-
-    // If channel was finished, restart playback
-    if (state.isFinished) {
-      state.isFinished = false;
-      state.isPlaying = false;
       setTimeout(() => playEpisode(), 1000);
     }
 
@@ -848,7 +769,6 @@ app.get('/api/queue/:channelId', (req, res) => {
     totalAnime: playlist.length,
     currentlyPlaying: state?.anime || 'None',
     currentEpisode: state?.ep || 0,
-    isFinished: state?.isFinished || false,
     queue: queue
   });
 });
@@ -928,8 +848,7 @@ app.get('/api/status', (req, res) => {
       currentAnime: state?.anime,
       currentEp: state?.ep,
       activeSlot: state?.activeSlot,
-      preloadReady: state?.preloadReady,
-      isFinished: state?.isFinished || false
+      preloadReady: state?.preloadReady
     };
   }
   res.json(status);
@@ -970,4 +889,3 @@ app.listen(PORT, () => {
   console.log(`- http://localhost:${PORT}/add-anime`);
   console.log(`- http://localhost:${PORT}/api/status`);
   console.log(`- http://localhost:${PORT}/api/channels`);
-});

@@ -889,3 +889,4 @@ app.listen(PORT, () => {
   console.log(`- http://localhost:${PORT}/add-anime`);
   console.log(`- http://localhost:${PORT}/api/status`);
   console.log(`- http://localhost:${PORT}/api/channels`);
+});
